@@ -1,0 +1,6 @@
+Description of project as proposed by Professor B. Glocker: 
+The goal of this project is to develop a software tool for automatic identification of fossils and insects from photographs. Such a tool could greatly support taxonomists in classification of existing and discovery of new species. The automatic identification will be achieved by implementing a robust image processing pipeline with takes elements from pattern recognition and machine learning into account. Based on discriminative feature extraction and supervised clustering techniques the software should be able to classify a given photograph with high accuracy.
+
+The software will be implemented either in Matlab or C++ using the OpenCV library (depending on the student's expierence). Knowledge in image processing, computer vision, and machine learning/artificial intelligence are beneficial.
+
+This project is in collaboration with Prof. Norman MacLeod from the National History Museum London.
