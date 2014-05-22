@@ -1,0 +1,115 @@
+\documentclass[11pt, titlepage, oneside]{article}
+
+\usepackage{caption}
+\usepackage{times}
+\usepackage[margin = 2cm]{geometry}
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{natbib}
+\usepackage{epstopdf}
+\usepackage{enumerate}
+\usepackage{url}
+\usepackage{epstopdf}
+\usepackage{mdwlist} 						%%WM: added to compact lists 
+%\usepackage{tikz}							%% Uncomment if you're using diagrams
+\geometry{a4paper}
+%\linespread{1.6}							%% Increase or decrease line spacing
+
+% Proof Style
+\renewcommand{\qedsymbol}{$\blacksquare$} 	%% Ends proofs with a black square, comment out for the standard box
+
+% Theorem Styles
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}{Lemma}[theorem]
+\newtheorem{proposition}{Proposition}[theorem]
+\newtheorem{corollary}{Corollary}[theorem]
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{fact}{Fact}
+
+\theoremstyle{remark}
+\newtheorem{exercise}{Exercise}[section]
+\newtheorem{example}[exercise]{Example}
+	
+%% Most people number theorems,lemma & propositions together
+%% and wouldn't number a definition
+
+% List Styles
+\renewcommand{\theenumi}{\roman{enumi}}   	%% Choose to uncomment this
+%\renewcommand{\theenumi}{arabic}  			%% Or this
+\pagenumbering{arabic}
+
+%relative image paths and image file types
+\DeclareGraphicsExtensions{.pdf,.png,.jpg,.eps}
+\graphicspath{ {./images/} }
+
+% Title and Author of the document
+\title{Automatic classification of fossils and insects}
+\author{Matthew Lee}
+\date{\today}                						
+
+\begin{document}
+
+
+
+
+\begin{minipage}[b]{\linewidth}
+	\center
+	\textsc{\Large Automatic classification of fossils and insects}\\
+	\vspace{1.0cm}
+	\Large Literature Survey \\
+	\vspace{1.0cm}
+	\normalsize Matthew Lee\\
+	\normalsize \texttt{ml3613@imperial.ac.uk}\\
+	\normalsize Supervised by: Professor Benjamin Glocker\\
+	\vspace{0.35cm}
+\today
+\end{minipage}
+
+\hspace{0.375cm}
+
+\tableofcontents
+
+%% =======================================================================%%
+%%                                                                              Introduction
+%% =======================================================================%%
+\section{Introduction}
+	Swedish botanist Carolus Linnaeus, often referred to as the father of taxonomy, developed the system known today as Linnaean classification for the categorization of organisms  based on morphology in the 18th century. Though taxonomy has come a long way since then and is now based on evolutionary relationships between organisms, identification by morphological traits is still very common. Qualitative descriptions of features coupled with subjective analysis of organisms can lead to erroneous classifications\cite[p.~154]{nature} which emphasizes the need for a more quantitative approach. The goal of the project is to develop software which is capable of automatically identifying different species of butterflies using feature detection.  
+%% =======================================================================%%
+%%                                                                              Methodology
+%% =======================================================================%%
+\section{Methodology}
+	
+%% =======================================================================%%
+%%                                                                                 Work Plan
+%% =======================================================================%%
+\section{Work Plan}
+
+
+%% =======================================================================%%
+%%                                                                                Bibliography                                                                      %%
+%% =======================================================================%%
+
+\bibliographystyle{plain}
+\begin{thebibliography}{1}
+	%\bibitem{key}
+	%	author,
+	%	\emph{title}.
+	%	publisher, country,
+	%	edition,
+	%	date.
+	\bibitem{nature}
+		NATURE,
+		\emph{Vol 467},
+		9 September 2010.
+		
+
+\end{thebibliography}	
+
+%% End of document...WAHEY!
+\end{document}
+
