@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>386</width>
-    <height>347</height>
+    <width>881</width>
+    <height>588</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,8 +17,8 @@
    <widget class="QPushButton" name="pushButton">
     <property name="geometry">
      <rect>
-      <x>120</x>
-      <y>220</y>
+      <x>700</x>
+      <y>20</y>
       <width>151</width>
       <height>31</height>
      </rect>
@@ -27,17 +27,45 @@
      <string>PushButton</string>
     </property>
    </widget>
-   <widget class="QLabel" name="myLabel">
+   <widget class="QLabel" name="label_pic">
     <property name="geometry">
      <rect>
-      <x>60</x>
-      <y>30</y>
-      <width>281</width>
-      <height>181</height>
+      <x>30</x>
+      <y>20</y>
+      <width>640</width>
+      <height>480</height>
      </rect>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>640</width>
+      <height>480</height>
+     </size>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>620</width>
+      <height>480</height>
+     </size>
     </property>
     <property name="text">
      <string/>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_2">
+    <property name="geometry">
+     <rect>
+      <x>700</x>
+      <y>70</y>
+      <width>151</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>PushButton</string>
     </property>
    </widget>
   </widget>
@@ -46,7 +74,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>386</width>
+     <width>881</width>
      <height>25</height>
     </rect>
    </property>

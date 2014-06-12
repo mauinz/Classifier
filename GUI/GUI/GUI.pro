@@ -13,8 +13,12 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp\
+        ../../Segmentor/segmentor.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h\
+         ../../Segmentor/segmentor.hpp
 
 FORMS    += mainwindow.ui
+
+LIBS += `pkg-config opencv --libs`

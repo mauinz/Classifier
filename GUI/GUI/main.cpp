@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 #include <QApplication>
-
+#include "../../Segmentor/segmentor.hpp"
 
 int main(int argc, char *argv[])
 {

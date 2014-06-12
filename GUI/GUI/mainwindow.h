@@ -2,6 +2,9 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <../../Segmentor/segmentor.hpp>
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
 
 namespace Ui {
 class MainWindow;
@@ -18,8 +21,15 @@ public:
 private slots:
     void on_pushButton_clicked();
 
+    void on_pushButton_2_clicked();
+
 private:
     Ui::MainWindow *ui;
+    Segmentor *s;
+    bool have_image;
+    void matToImage(cv::Mat& _mat, QImage& _res);
 };
+
+
 
 #endif // MAINWINDOW_H
