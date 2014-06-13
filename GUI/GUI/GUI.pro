@@ -21,4 +21,7 @@ HEADERS  += mainwindow.h\
 
 FORMS    += mainwindow.ui
 
-LIBS += `pkg-config opencv --libs`
+LIBS += `pkg-config opencv --libs` -L"/vol/bitbucket/ml3613/opencv/release/lib" -lopencv_nonfree
+
+INCLUDEPATH += "/vol/bitbucket/ml3613/opencv/modules/nonfree/include/"\
+               "/vol/bitbucket/ml3613/opencv/modules/core/include"

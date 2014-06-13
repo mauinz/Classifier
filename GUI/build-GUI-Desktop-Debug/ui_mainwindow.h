@@ -74,9 +74,9 @@ public:
     void retranslateUi(QMainWindow *MainWindow)
     {
         MainWindow->setWindowTitle(QApplication::translate("MainWindow", "MainWindow", 0));
-        pushButton->setText(QApplication::translate("MainWindow", "PushButton", 0));
+        pushButton->setText(QApplication::translate("MainWindow", "Choose Image", 0));
         label_pic->setText(QString());
-        pushButton_2->setText(QApplication::translate("MainWindow", "PushButton", 0));
+        pushButton_2->setText(QApplication::translate("MainWindow", "Classify", 0));
     } // retranslateUi
 
 };

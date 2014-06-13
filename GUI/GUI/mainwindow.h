@@ -20,13 +20,13 @@ public:
     
 private slots:
     void on_pushButton_clicked();
-
     void on_pushButton_2_clicked();
 
 private:
     Ui::MainWindow *ui;
     Segmentor *s;
     bool have_image;
+    // Convers a cv::Mat object to QImage for display in the GUI
     void matToImage(cv::Mat& _mat, QImage& _res);
 };
 

@@ -15,7 +15,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    ui->pushButton->setText("Choose Image");
 }
 
 MainWindow::~MainWindow()
@@ -24,6 +23,7 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+// Choose file and display it
 void MainWindow::on_pushButton_clicked()
 {
     QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), "~/", "All files (*.*)");
@@ -52,6 +52,7 @@ void MainWindow::on_pushButton_2_clicked()
     }
 }
 
+// Convers a cv::Mat object to QImage for display in the GUI
 void MainWindow::matToImage(cv::Mat &_mat, QImage &_res){
     cv::Mat temp;
     cv::cvtColor(_mat, temp, CV_BGR2RGB);

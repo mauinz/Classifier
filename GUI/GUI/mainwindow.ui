@@ -24,7 +24,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>PushButton</string>
+     <string>Choose Image</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_pic">
@@ -65,7 +65,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>PushButton</string>
+     <string>Classify</string>
     </property>
    </widget>
   </widget>
