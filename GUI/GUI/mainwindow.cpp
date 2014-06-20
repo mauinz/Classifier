@@ -55,7 +55,7 @@ void MainWindow::on_pushButton_2_clicked()
 // Convers a cv::Mat object to QImage for display in the GUI
 void MainWindow::matToImage(cv::Mat &_mat, QImage &_res){
     cv::Mat temp;
-    cv::cvtColor(_mat, temp, CV_BGR2RGB);
+    cv::cvtColor(_mat, temp, cv::COLOR_BGR2RGB);
 
     _res = QImage((uchar*)temp.data,temp.cols,temp.rows,temp.step, QImage::Format_RGB888);
 }
