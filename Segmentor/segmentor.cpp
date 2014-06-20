@@ -1,8 +1,7 @@
 #include <opencv2/core/core.hpp>
+#include <opencv2/opencv.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-#include </vol/bitbucket/ml3613/opencv/modules/nonfree/include/opencv2/nonfree/features2d.hpp>
-#include </vol/bitbucket/ml3613/opencv/modules/nonfree/include/opencv2/nonfree.hpp>
 #include <iostream>
 #include <sstream>
 #include "segmentor.hpp"
@@ -80,7 +79,7 @@ int Segmentor::segment(char* argv, Mat& _res){
   // waitKey();
   return 0;
 }
-
+/*
 int Segmentor::getSIFT(char* argv, cv::Mat& _res){
     const cv::Mat input = cv::imread(argv, 0);
     initModule_nonfree();
@@ -93,4 +92,4 @@ int Segmentor::getSIFT(char* argv, cv::Mat& _res){
     cv::drawKeypoints(input, keypoints, _res);
 
     return 0;
-}
+}*/
