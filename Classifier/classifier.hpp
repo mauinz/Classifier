@@ -15,6 +15,7 @@ public:
   ~Classifier();
   // Main functionality of the class
   int getSIFT(const char* argv, cv::Mat& _res);
+  int getWords(const char * folderpath);
 };
 
 #endif
