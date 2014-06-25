@@ -32,10 +32,11 @@ int Classifier::getSIFT(const char* argv, cv::Mat& _res){
 int Classifier::getWords(const char * folderpath){
   cv::initModule_nonfree();
   //Set up components
-  cv::SiftDescriptorExtractor extractor;
-  cv::SiftFeatureDetector detector(500);
+  cv::SurfDescriptorExtractor extractor;
+  cv::SurfFeatureDetector detector(500);
   std::vector<cv::KeyPoint> keypoints;
   cv::Mat training_descriptors(1,extractor.descriptorSize(),extractor.descriptorType());
+  std::cout << extractor.descriptorType() << std::endl;
   cv::Mat descriptors;
 
   //get file names and containing folder
@@ -55,24 +56,35 @@ int Classifier::getWords(const char * folderpath){
   
   cout << "Total descriptors: " << training_descriptors.rows << endl;
 
-  cv::BOWKMeansTrainer bowtrainer(1000); //num clusters
-  bowtrainer.add(training_descriptors);
-  std::cout << "clustering features" << std::endl;
-  cv::Mat vocabulary = bowtrainer.cluster();
-  
-  std::cout << "Saving vocabulary" << std::endl;
-  std::string save_name = "Vocabulary_";
-
+  //Save descriptors
+  std::cout << "Saving Descriptors" << std::endl;
+  std::string save_des = "Descriptors_";
   time_t     now = time(0);
   struct tm  tstruct;
   char       buf[80];
   tstruct = *localtime(&now);
   strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &tstruct);
-  save_name += buf;
-  save_name += ".yml";
-  std::cout << "Saving vocabulary as: " << save_name << std::endl;
-  FileStorage fs1(save_name, FileStorage::WRITE);
-  fs1 << "vocabulary" << vocabulary;
+  save_des += buf;
+  save_des += ".yml";
+  std::cout << "Saving descriptors as: " << save_des << std::endl;
+  FileStorage fs1(save_des, FileStorage::WRITE);
+  fs1 << "training_descriptors" << training_descriptors;
   fs1.release();
+
+  // Find vocabulary
+  cv::BOWKMeansTrainer bowtrainer(1000); //num clusters
+  bowtrainer.add(training_descriptors);
+  std::cout << "clustering features" << std::endl;
+  cv::Mat vocabulary = bowtrainer.cluster();
+  
+  // Save vocabulary
+  std::cout << "Saving vocabulary" << std::endl;
+  std::string save_voc = "Vocabulary_";
+  save_voc += buf;
+  save_voc += ".yml";
+  std::cout << "Saving vocabulary as: " << save_voc << std::endl;
+  FileStorage fs2(save_voc, FileStorage::WRITE);
+  fs2 << "vocabulary" << vocabulary;
+  fs2.release();
   return 0;
 }
