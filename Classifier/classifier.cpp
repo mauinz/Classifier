@@ -8,6 +8,7 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <iomanip>
 #include "classifier.hpp"
 #include <boost/lambda/bind.hpp>
 
@@ -93,66 +94,53 @@ int Classifier::getWords(const char * folderpath){
 int Classifier::makeFileList(const char * folderpath){
 
   std::vector<std::string> folderlist;
-  int count;
-  
+  std::vector<std::vector<string> > image_split;
+  int count, folder_count= -1;
+  srand (2);
   for ( boost::filesystem::recursive_directory_iterator end, dir(folderpath); 
-       dir != end; ++dir ) {
+	dir != end; ++dir ) {
     if(!boost::filesystem::is_regular_file(*dir)){
       folderlist.push_back(dir->path().string());
     }
   }
   
   int test_count[folderlist.size()];
-
+  
   for(unsigned int i = 0; i < folderlist.size(); i++){
     count = 0;
     for( boost::filesystem::recursive_directory_iterator end, dir(folderlist[i]); dir!= end; dir++){
       count++;
     }
-    std::cout << folderlist[i] << ": " << count << std::endl;
+    //std::cout << folderlist[i] << ": " << count << std::endl;
     test_count[i] = rand() % count;
-    std::cout << test_count[i] << std::endl;
+    //std::cout << test_count[i] << std::endl;
   }
-
   
-  return 0;
-  /*
-  cnt= std::count_if(
-        directory_iterator(the_path),
-        directory_iterator(),
-        bind( static_cast<bool(*)(const path&)>(is_regular_file), 
-          bind( &directory_entry::path, _1 ) ) );
-  return 0;
-  */
-    /*
-  vector<KeyPoint> keypoints;
-  Mat response_hist;
-  Mat img;
-  string filepath;
-  map<string,Mat> classes_training_data;
-  
-  Ptr<FeatureDetector > detector(new SurfFeatureDetector());
-  Ptr<DescriptorMatcher > matcher(new BruteForceMatcher<L2<float> >());
-  Ptr<DescriptorExtractor > extractor(new OpponentColorDescriptorExtractor(Ptr<DescriptorExtractor>(new SurfDescriptorExtractor())));
-  Ptr<BOWImgDescriptorExtractor> bowide(new BOWImgDescriptorExtractor(extractor,matcher));
-  bowide->setVocabulary(vocabulary);
-  
-#pragma omp parallel for schedule(dynamic,3)
-  for(..loop a directory?..) {
-    img = imread(filepath);
-    detector->detect(img,keypoints);
-    bowide.compute(img, keypoints, response_hist);
-    
-   #pragma omp critical
-    {
-      if(classes_training_data.count(class_) == 0) { //not yet created...
-	classes_training_data[class_].create(0,response_hist.cols,response_hist.type());
-	classes_names.push_back(class_);
-      }
-      classes_training_data[class_].push_back(response_hist);
+  for ( boost::filesystem::recursive_directory_iterator end, dir(folderpath); 
+	dir != end; ++dir) {
+    if(!boost::filesystem::is_regular_file(*dir)){
+      folder_count++;
+      count = 0;
     }
-    total_samples++;
-  }*/
+    if(boost::filesystem::is_regular_file(*dir)){
+      std::vector<string> tmp;
+      tmp.push_back(dir->path().string());
+      tmp.push_back(dir->path().parent_path().filename().string());
+      if(test_count[folder_count] == count){
+	tmp.push_back("test");
+      }
+      else{
+	tmp.push_back("train");
+      }
+      image_split.push_back(tmp);
+      count++;
+      //std::cout <<test_count[folder_count] << ":"<< count << std::endl;
+    }
+  }
+  
+  print2Dvector(image_split);
+  
+  return 0;
   
 }
 
@@ -168,4 +156,14 @@ void Classifier::checkFolders(const char * folderpath){
   if(!need_checking){
     std::cout << "All files are as expected" << std::endl;
   }
+}
+
+void Classifier::print2Dvector(std::vector<std::vector<string> > print){
+  for(unsigned int i = 0; i < print.size();i++){
+    for(unsigned int j = 0; j < print[i].size(); j++){
+      std::cout << std::setw(10) << print[i][j];
+    }
+    std::cout << std::endl;
+  }
+
 }

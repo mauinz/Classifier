@@ -4,9 +4,10 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <string>
 
-#define TEST_CASE = 1
-#define TRAIN_CASE = 0
+#define TEST_CASE 1
+#define TRAIN_CASE 0
 
 class Classifier{
 private:
@@ -21,6 +22,7 @@ public:
   int getWords(const char * folderpath);
   int makeFileList(const char * folderpath);
   void checkFolders(const char * folderpath);
+void print2Dvector(std::vector<std::vector<std::string> > print);
 };
 
 #endif
