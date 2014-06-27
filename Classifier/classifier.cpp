@@ -8,7 +8,9 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <fstream>
 #include <iomanip>
+#include <boost/algorithm/string.hpp>
 #include "classifier.hpp"
 #include <boost/lambda/bind.hpp>
 
@@ -96,7 +98,12 @@ int Classifier::makeFileList(const char * folderpath){
   std::vector<std::string> folderlist;
   std::vector<std::vector<string> > image_split;
   int count, folder_count= -1;
-  srand (2);
+  // Set between 1 - 5 for each test case, can be used to replicate
+  // the random test sets
+  int seed = 1;
+  srand (seed);
+
+  // Store a list of all folders
   for ( boost::filesystem::recursive_directory_iterator end, dir(folderpath); 
 	dir != end; ++dir ) {
     if(!boost::filesystem::is_regular_file(*dir)){
@@ -104,6 +111,7 @@ int Classifier::makeFileList(const char * folderpath){
     }
   }
   
+  // Choose which image in each folder will be our test case
   int test_count[folderlist.size()];
   
   for(unsigned int i = 0; i < folderlist.size(); i++){
@@ -116,6 +124,7 @@ int Classifier::makeFileList(const char * folderpath){
     //std::cout << test_count[i] << std::endl;
   }
   
+  // Generate a full list of filepath / classification / test or train
   for ( boost::filesystem::recursive_directory_iterator end, dir(folderpath); 
 	dir != end; ++dir) {
     if(!boost::filesystem::is_regular_file(*dir)){
@@ -137,9 +146,18 @@ int Classifier::makeFileList(const char * folderpath){
       //std::cout <<test_count[folder_count] << ":"<< count << std::endl;
     }
   }
+
+  // print2Dvector(image_split);
   
-  print2Dvector(image_split);
-  
+  // Save to csv
+  save2Dvector(image_split,seed);
+
+  // load2Dvector() TEST
+  /*
+  vector<vector<std::string> > test;
+  load2Dvector(test, "test_seed_1");
+  print2Dvector(test);
+  */
   return 0;
   
 }
@@ -165,5 +183,41 @@ void Classifier::print2Dvector(std::vector<std::vector<string> > print){
     }
     std::cout << std::endl;
   }
+}
+template <typename T>
+std::string to_string(T value)
+{
+	std::ostringstream os ;
+	os << value ;
+	return os.str() ;
+}
 
+void Classifier::save2Dvector(std::vector<std::vector<string> > print, int seed){
+  ofstream myfile;
+  std::string save_name = "test_seed_";
+  save_name += to_string(seed);
+  myfile.open(save_name.c_str());
+
+  for(unsigned int i = 0; i < print.size();i++){
+    for(unsigned int j = 0; j < print[i].size(); j++){
+      myfile << print[i][j];
+      if(j != 2){
+	myfile << ", ";
+      }
+    }
+    myfile << std::endl;
+  }
+  myfile.close();
+}
+void Classifier::load2Dvector(std::vector<std::vector<string> > &print,std::string file_path){
+  std::ifstream myfile;
+  
+  myfile.open(file_path.c_str());
+  for( std::string line; getline( myfile, line ); ){
+    vector<std::string> tmp_line;
+    boost::split(tmp_line,line, boost::is_any_of(","));
+    print.push_back(tmp_line);
+  }
+ 
+  myfile.close();
 }

@@ -23,6 +23,8 @@ public:
   int makeFileList(const char * folderpath);
   void checkFolders(const char * folderpath);
 void print2Dvector(std::vector<std::vector<std::string> > print);
+void save2Dvector(std::vector<std::vector<std::string> > print, int seed);
+void load2Dvector(std::vector<std::vector<std::string> > &print,std::string file_path);
 };
 
 #endif
