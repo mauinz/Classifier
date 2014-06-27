@@ -17,10 +17,27 @@ int main(){
   return 0;
   */
   
+  // getVocab() TEST
+  /*
   Classifier* myclas = new Classifier;
   //for testing purposes use:
   //"/home/matthew/Documents/Data/UK-Leps.images/Boloria-selene/"
   myclas->getWords("/home/matthew/Documents/Data/UK-Leps.images");
   delete myclas;
   return 0;
+  */
+  // makeFileList() TEST
+  
+  Classifier* myclas = new Classifier;
+  myclas->makeFileList("/home/matthew/Documents/Data/UK-Leps.images");
+  delete myclas;
+  return 0;
+  
+  //checkFolders() TEST
+  /*
+  Classifier* myclas = new Classifier;
+  myclas->checkFolders("/home/matthew/Documents/Data/UK-Leps.images");
+  delete myclas;
+  return 0;
+  */
 }

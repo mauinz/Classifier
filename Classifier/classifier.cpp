@@ -9,6 +9,7 @@
 #include <iostream>
 #include <sstream>
 #include "classifier.hpp"
+#include <boost/lambda/bind.hpp>
 
 using namespace std;
 using namespace cv;
@@ -87,4 +88,84 @@ int Classifier::getWords(const char * folderpath){
   fs2 << "vocabulary" << vocabulary;
   fs2.release();
   return 0;
+}
+
+int Classifier::makeFileList(const char * folderpath){
+
+  std::vector<std::string> folderlist;
+  int count;
+  
+  for ( boost::filesystem::recursive_directory_iterator end, dir(folderpath); 
+       dir != end; ++dir ) {
+    if(!boost::filesystem::is_regular_file(*dir)){
+      folderlist.push_back(dir->path().string());
+    }
+  }
+  
+  int test_count[folderlist.size()];
+
+  for(unsigned int i = 0; i < folderlist.size(); i++){
+    count = 0;
+    for( boost::filesystem::recursive_directory_iterator end, dir(folderlist[i]); dir!= end; dir++){
+      count++;
+    }
+    std::cout << folderlist[i] << ": " << count << std::endl;
+    test_count[i] = rand() % count;
+    std::cout << test_count[i] << std::endl;
+  }
+
+  
+  return 0;
+  /*
+  cnt= std::count_if(
+        directory_iterator(the_path),
+        directory_iterator(),
+        bind( static_cast<bool(*)(const path&)>(is_regular_file), 
+          bind( &directory_entry::path, _1 ) ) );
+  return 0;
+  */
+    /*
+  vector<KeyPoint> keypoints;
+  Mat response_hist;
+  Mat img;
+  string filepath;
+  map<string,Mat> classes_training_data;
+  
+  Ptr<FeatureDetector > detector(new SurfFeatureDetector());
+  Ptr<DescriptorMatcher > matcher(new BruteForceMatcher<L2<float> >());
+  Ptr<DescriptorExtractor > extractor(new OpponentColorDescriptorExtractor(Ptr<DescriptorExtractor>(new SurfDescriptorExtractor())));
+  Ptr<BOWImgDescriptorExtractor> bowide(new BOWImgDescriptorExtractor(extractor,matcher));
+  bowide->setVocabulary(vocabulary);
+  
+#pragma omp parallel for schedule(dynamic,3)
+  for(..loop a directory?..) {
+    img = imread(filepath);
+    detector->detect(img,keypoints);
+    bowide.compute(img, keypoints, response_hist);
+    
+   #pragma omp critical
+    {
+      if(classes_training_data.count(class_) == 0) { //not yet created...
+	classes_training_data[class_].create(0,response_hist.cols,response_hist.type());
+	classes_names.push_back(class_);
+      }
+      classes_training_data[class_].push_back(response_hist);
+    }
+    total_samples++;
+  }*/
+  
+}
+
+void Classifier::checkFolders(const char * folderpath){
+  bool need_checking = false;
+  for ( boost::filesystem::recursive_directory_iterator end, dir(folderpath); 
+       dir != end; ++dir ) {
+    if(boost::filesystem::is_regular_file(*dir) &&!(boost::filesystem::extension(*dir)== ".tif") ){
+      std::cout << "Please check file: " << *dir << std::endl;
+      need_checking = true;
+    }
+  }
+  if(!need_checking){
+    std::cout << "All files are as expected" << std::endl;
+  }
 }
