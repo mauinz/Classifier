@@ -4,6 +4,7 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <map>
 #include <string>
 
 #define TEST_CASE 1
@@ -22,9 +23,11 @@ public:
   int getWords(const char * folderpath);
   int makeFileList(const char * folderpath);
   void checkFolders(const char * folderpath);
-void print2Dvector(std::vector<std::vector<std::string> > print);
-void save2Dvector(std::vector<std::vector<std::string> > print, int seed);
-void load2Dvector(std::vector<std::vector<std::string> > &print,std::string file_path);
+  void print2Dvector(std::vector<std::vector<std::string> > print);
+  void save2Dvector(std::vector<std::vector<std::string> > print, int seed);
+  void load2Dvector(std::vector<std::vector<std::string> > &print,std::string file_path);
+  void extractTrainingData(std::string filepath, std::map<std::string,cv::Mat>& classes_training_data, cv::Mat vocabulary);
+  void trainSVM(std::string vocab_path, std::string train_path);
 };
 
 #endif
