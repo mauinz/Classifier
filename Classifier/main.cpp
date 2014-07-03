@@ -22,14 +22,18 @@ int main(){
   Classifier* myclas = new Classifier;
   //for testing purposes use:
   //"/home/matthew/Documents/Data/UK-Leps.images/Boloria-selene/"
-  myclas->getWords("/home/matthew/Documents/Data/UK-Leps.images");
+  //myclas->getWords("/home/matthew/Documents/Data/UK-Leps.images");
+  myclas->getWords("/home/matthew/Documents/classifier/Classifier/Seeds/test_seed_1");
   delete myclas;
   return 0;
   */
   // makeFileList() TEST
   /*
   Classifier* myclas = new Classifier;
-  myclas->makeFileList("/home/matthew/Documents/Data/UK-Leps.images");
+  myclas->makeFileList("/home/matthew/Documents/Data/UK-Leps.images",2);
+  myclas->makeFileList("/home/matthew/Documents/Data/UK-Leps.images",3);
+  myclas->makeFileList("/home/matthew/Documents/Data/UK-Leps.images",4);
+  myclas->makeFileList("/home/matthew/Documents/Data/UK-Leps.images",5);
   delete myclas;
   return 0;
   */
@@ -42,11 +46,19 @@ int main(){
   */
   
   // Setting up SVM TEST
-  
+  /*
   Classifier* myclas = new Classifier;
-  myclas->trainSVM("/home/matthew/Documents/classifier/Classifier/Vocabulary_2014-06-30.14:58:15.yml",
-		   "/home/matthew/Documents/classifier/Classifier/test_seed_1");
+  myclas->trainSVM("/home/matthew/Documents/classifier/Classifier/Vocabularies/Vocabulary_2014-07-03.16:10:49.yml",
+		   "/home/matthew/Documents/classifier/Classifier/Seeds/test_seed_1");
   delete myclas;
   return 0;
-  
+  */
+  // Testing SVM results
+  Classifier* myclas = new Classifier;
+  myclas->testSVM("/home/matthew/Documents/classifier/Classifier/Seeds/test_seed_1",
+	  "/home/matthew/Documents/classifier/Classifier/Vocabularies/Vocabulary_2014-07-03.16:10:49.yml",
+	  "/home/matthew/Documents/classifier/Classifier/SVMS");
+  delete myclas;
+  return 0;
+
 }
