@@ -22,6 +22,15 @@ using namespace cv;
 
 Classifier::Classifier(){}
 Classifier::~Classifier(){}
+
+template <typename T>
+//=======================================================================================
+std::string to_string(T value){
+//=======================================================================================
+  std::ostringstream os ;
+  os << value ;
+  return os.str() ;
+}
 //=======================================================================================
 int Classifier::getSIFT(const char* argv, cv::Mat& _res){
 //=======================================================================================
@@ -36,11 +45,13 @@ int Classifier::getSIFT(const char* argv, cv::Mat& _res){
 
     return 0;
 }
+// folderpath = If directory, must point to directory of images, each class seperated into folders
+// folderpath = If file, must point to a seed file which can be generated with makeFileList()
 //=======================================================================================
-int Classifier::getWords(const char * folderpath){
+int Classifier::getWords(const char * folderpath, int seed, bool verbose = true){
 //=======================================================================================
-  cv::initModule_nonfree();
   // Set up components
+  cv::initModule_nonfree();
   Ptr<FeatureDetector > detector(new SiftFeatureDetector(400)); //detector
   Ptr<DescriptorExtractor > extractor(
 				      new OpponentColorDescriptorExtractor(
@@ -50,52 +61,75 @@ int Classifier::getWords(const char * folderpath){
   Ptr<DescriptorMatcher > matcher(new BFMatcher); // Brute Force matcher
   std::vector<cv::KeyPoint> keypoints;
   cv::Mat training_descriptors(0,extractor->descriptorSize(),extractor->descriptorType());
-  //std::cout << extractor->descriptorType() << std::endl;
   cv::Mat descriptors;
 
   // Get file names and containing folder
-  std::cout << "Opening files and extracting features" << std::endl;
-  std::cout << "descriptor mat size: " << training_descriptors.rows << std::endl;
+  if(verbose){
+    std::cout << "Opening files and extracting features" << std::endl;
+  }
   //==========================================
   // For use with full data set METHOD 1
   //==========================================
-  /*
-  for ( boost::filesystem::recursive_directory_iterator end, dir(folderpath); 
-       dir != end; ++dir ) {
-    if(boost::filesystem::is_regular_file(*dir) && boost::filesystem::extension(*dir)== ".tif" ){
-      std::cout << "Reading: " << dir->path().string() << std::endl;
-      Mat img = imread(dir->path().string());
-      std::cout << "Detecting" << std::endl;
-      detector->detect(img, keypoints);
-      std::cout << "Extracting" << std::endl;
-      extractor->compute(img,keypoints,descriptors);
-      training_descriptors.push_back(descriptors);
+  // If directory
+  boost::filesystem::path  dir(folderpath);
+  if(!boost::filesystem::is_regular_file(dir)){
+    if(verbose){
+      std::cout << "Using full directory" << std::endl;
+    }
+    for ( boost::filesystem::recursive_directory_iterator end, dir(folderpath); 
+	  dir != end; ++dir ) {
+      if(boost::filesystem::is_regular_file(*dir) && boost::filesystem::extension(*dir)== ".tif" ){
+	if(verbose){
+	  std::cout << "Reading: " << dir->path().string() << std::endl;
+	}
+	Mat img = imread(dir->path().string());
+	if(verbose){ 
+	  std::cout << "Detecting" << std::endl;
+	}
+	detector->detect(img, keypoints);
+	if(verbose){
+	  std::cout << "Extracting" << std::endl;
+	}
+	extractor->compute(img,keypoints,descriptors);
+	training_descriptors.push_back(descriptors);
+      }
     }
   }
-  */
+  
   //==========================================
   // For use with seed file METHOD 2
   //==========================================
-  std::vector<std::vector<string> > seed_data;
-  load2Dvector(seed_data, folderpath);
-  for(unsigned int i = 0; i < seed_data.size(); i++){
-    if(seed_data[i][2] == " train"){
-      std::cout << "Reading: " << seed_data[i][0] << std::endl;
-      Mat img = imread(seed_data[i][0]);
-      std::cout << "Detecting" << std::endl;
-      detector->detect(img, keypoints);
-      std::cout << "Extracting" << std::endl;
-      extractor->compute(img,keypoints,descriptors);
-      training_descriptors.push_back(descriptors);
+  // Else seed file
+  else{
+    if(verbose){
+      std::cout << "Using Seed file" << std::endl;
+    }
+    std::vector<std::vector<string> > seed_data;
+    load2Dvector(seed_data, folderpath);
+    for(unsigned int i = 0; i < seed_data.size(); i++){
+      if(seed_data[i][2] == "train"){
+	if(verbose){
+	  std::cout << "Reading: " << seed_data[i][0] << std::endl;
+	}
+	Mat img = imread(seed_data[i][0]);
+	if(verbose){
+	  std::cout << "Detecting" << std::endl;
+	}
+	detector->detect(img, keypoints);
+	if(verbose){
+	  std::cout << "Extracting" << std::endl;
+	}
+	extractor->compute(img,keypoints,descriptors);
+	training_descriptors.push_back(descriptors);
+      }
     }
   }
-  
 
-  
-  cout << "Total descriptors: " << training_descriptors.rows << endl;
-
+  if(verbose){
+    std::cout << "Total descriptors: " << training_descriptors.rows << std::endl
+	      << "Saving Descriptors" << std::endl;
+  }
   // Save descriptors
-  std::cout << "Saving Descriptors" << std::endl;
   std::string save_des = "Descriptors/Descriptors_";
   time_t     now = time(0);
   struct tm  tstruct;
@@ -104,6 +138,7 @@ int Classifier::getWords(const char * folderpath){
   strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &tstruct);
   save_des += buf;
   save_des += ".yml";
+  // Currently not saving descriptors as file is a bit large
   //std::cout << "Saving descriptors as: " << save_des << std::endl;
   //FileStorage fs1(save_des, FileStorage::WRITE);
   //fs1 << "training_descriptors" << training_descriptors;
@@ -118,6 +153,8 @@ int Classifier::getWords(const char * folderpath){
   // Save vocabulary
   std::cout << "Saving vocabulary" << std::endl;
   std::string save_voc = "Vocabularies/Vocabulary_";
+  save_voc += to_string(seed);
+  save_voc += "_";
   save_voc += buf;
   save_voc += ".yml";
   std::cout << "Saving vocabulary as: " << save_voc << std::endl;
@@ -219,14 +256,6 @@ void Classifier::print2Dvector(std::vector<std::vector<string> > print){
     std::cout << std::endl;
   }
 }
-template <typename T>
-//=======================================================================================
-std::string to_string(T value){
-//=======================================================================================
-  std::ostringstream os ;
-  os << value ;
-  return os.str() ;
-}
 //=======================================================================================
 void Classifier::save2Dvector(std::vector<std::vector<string> > print, int seed){
 //=======================================================================================
@@ -239,7 +268,7 @@ void Classifier::save2Dvector(std::vector<std::vector<string> > print, int seed)
     for(unsigned int j = 0; j < print[i].size(); j++){
       myfile << print[i][j];
       if(j != 2){
-	myfile << ", ";
+	myfile << ",";
       }
     }
     myfile << std::endl;
@@ -264,7 +293,7 @@ void Classifier::load2Dvector(std::vector<std::vector<string> > &print,std::stri
 // vocab_path = Path of vocabulary file
 // train_path = Path of seed file
 //=======================================================================================
-void Classifier::trainSVM(std::string vocab_path, std::string train_path){
+void Classifier::trainSVM(std::string vocab_path, std::string train_path, int seed){
 //=======================================================================================
   cv::initModule_nonfree();
   cout << "Training SVM" << endl;
@@ -303,7 +332,9 @@ void Classifier::trainSVM(std::string vocab_path, std::string train_path){
   char       buf[80];
   tstruct = *localtime(&now);
   strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &tstruct);
-
+  stringstream folder_name;
+  folder_name << "SVMS_" << buf;
+  boost::filesystem::create_directories(folder_name.str());
   for (unsigned int i=0;i<class_names.size();i++) {
     string class_ = class_names[i];
     
@@ -330,10 +361,10 @@ void Classifier::trainSVM(std::string vocab_path, std::string train_path){
     if(samples.rows == 0) continue; //phantom class?!
     CvSVM classifier;
     classifier.train(samples_32f,labels);
-
+    
     stringstream ss;
-    ss << "SVMS/SVM_classifier_";
-    ss << buf << "_";
+    ss << "SVMS_" << to_string(seed) << buf << "/SVM_classifier_";
+    ss << buf << "~";
     ss << class_ << ".yml";
     cout << "Saving as: " << ss.str() << endl;
     classifier.save(ss.str().c_str());
@@ -363,7 +394,7 @@ void Classifier::extractTrainingData(std::string filepath, std::map<string,Mat>&
   std::cout << "Descriptor size: " << bowide.descriptorSize() << std::endl; 
 
   for(unsigned int i = 0; i < seed.size(); i++){
-    if(seed[i][2] == " train"){
+    if(seed[i][2] == "train"){
       img = imread(seed[i][0]);
       detector->detect(img,keypoints);
       bowide.compute(img, keypoints, response_hist);
@@ -380,11 +411,11 @@ void Classifier::extractTrainingData(std::string filepath, std::map<string,Mat>&
 // vocav_path = Path to vocabulary file
 // svm_path   = Path to SVM files
 //=======================================================================================
-void Classifier::testSVM(std::string seed_path, std::string vocab_path, std::string svm_path){
+void Classifier::testSVM(std::string seed_path, std::string vocab_path, std::string svm_path, int seed){
 //=======================================================================================
   cv::initModule_nonfree();
   float count = 0, correct = 0;
-  //map<string,map<string,int> > confusion_matrix; // confusionMatrix[classA][classB] = number_of_times_A_voted_for_B;
+  map<string,map<string,int> > confusion_matrix; // confusionMatrix[classA][classB] = number_of_times_A_voted_for_B;
   map<string,unique_ptr<CvSVM>> classes_classifiers;//CvSVM tmp_SVM;
   vector<string> files; //load up with images
   vector<string> classes; //load up with the respective classes
@@ -413,7 +444,7 @@ void Classifier::testSVM(std::string seed_path, std::string vocab_path, std::str
     if(boost::filesystem::is_regular_file(*dir)){
       std::cout << "Reading: " << dir->path().string() << std::endl;
       vector<std::string> tmp_line;
-      boost::split(tmp_line,dir->path().string(), boost::is_any_of(" "));
+      boost::split(tmp_line,dir->path().string(), boost::is_any_of("~"));
       
       std::string class_name = tmp_line[1].substr(0, tmp_line[1].size()-4);
 
@@ -424,7 +455,7 @@ void Classifier::testSVM(std::string seed_path, std::string vocab_path, std::str
   }
 
   for(unsigned int i = 0; i < test_images.size(); i++) {
-    if(test_images[i][2] == " test"){
+    if(test_images[i][2] == "test"){
       Mat img = imread(test_images[i][0]), response_hist;      
       vector<KeyPoint> keypoints;
       detector->detect(img,keypoints);
@@ -439,12 +470,29 @@ void Classifier::testSVM(std::string seed_path, std::string vocab_path, std::str
 	}
       }
       std::cout << "Case: " << test_images[i][1] << " MinClass prediction: " << minclass << std::endl;
-      if(test_images[i][1].substr(1,test_images[i][1].size()) == minclass){
+      if(test_images[i][1] == minclass){
 	correct++;
       }
       count++;
-      //confusion_matrix[minclass][classes[i]]++; 
+      confusion_matrix[minclass][test_images[i][1]]++; 
     }
   }
   std::cout << "Total Accuracy: " << (correct/count)*100 << "%" << std::endl;
+  
+  ofstream myfile;
+
+  std::string save_name = "Confusions/cm_";
+  save_name += to_string(seed);
+  myfile.open(save_name.c_str());
+
+  std::cout << "------------------Confusion Matix------------------" << std::endl;
+  for(map<string,map<string,int> >::iterator it = confusion_matrix.begin(); it != confusion_matrix.end(); ++it) {
+    myfile << (*it).first << " -> ";
+    cout << (*it).first << " -> ";
+    for(map<string,int>::iterator it1 = (*it).second.begin(); it1 != (*it).second.end(); ++it1) {
+      myfile << (*it1).first << ":" << (*it1).second << endl;
+      cout << (*it1).first << ":" << (*it1).second << endl;
+    }
+  }
+  myfile.close();
 }

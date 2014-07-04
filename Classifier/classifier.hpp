@@ -20,15 +20,15 @@ public:
   ~Classifier();
   // Main functionality of the class
   int getSIFT(const char* argv, cv::Mat& _res);
-  int getWords(const char * folderpath);
+  int getWords(const char * folderpath,int seed, bool verbose);
   int makeFileList(const char * folderpath, int seed);
   void checkFolders(const char * folderpath);
   void print2Dvector(std::vector<std::vector<std::string> > print);
   void save2Dvector(std::vector<std::vector<std::string> > print, int seed);
   void load2Dvector(std::vector<std::vector<std::string> > &print,std::string file_path);
   void extractTrainingData(std::string filepath, std::map<std::string,cv::Mat>& classes_training_data, cv::Mat vocabulary);
-  void trainSVM(std::string vocab_path, std::string train_path);
-  void testSVM(std::string seed_path, std::string vocab_path, std::string svm_path);
+  void trainSVM(std::string vocab_path, std::string train_path, int seed);
+  void testSVM(std::string seed_path, std::string vocab_path, std::string svm_path, int seed);
 };
 
 #endif
