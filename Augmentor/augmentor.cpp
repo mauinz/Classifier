@@ -130,14 +130,14 @@ void Augmentor::augImage(std::string image_path){
   channels_vec.push_back(channels[1]);
   channels_vec.push_back(channels[2]);
   
-  cv::Mat input = asRowMatrix(channels_vec,CV_8U);
-  cv::PCA pca( input, cv::Mat(),CV_PCA_DATA_AS_ROW);
+  cv::Mat input = asRowMatrix(image, image.type() );
+  cv::PCA pca(image, cv::Mat(),CV_PCA_DATA_AS_ROW);
   Mat mean = pca.mean.clone();
   Mat eigenvalues = pca.eigenvalues.clone();
   Mat eigenvectors = pca.eigenvectors.clone();
-  Mat test = eigenvalues.row(0)*eigenvectors.row(0) + eigenvalues.row(1)*eigenvectors.row(1) + eigenvalues.row(2)*eigenvectors.row(2)  - 3*mean;
-  imshow("avg", norm_0_255(mean.reshape(1, channels[0].rows)));
-  imshow("test", norm_0_255(test.reshape(1, channels[0].rows)));
+  Mat test = eigenvalues.row(0)*eigenvectors.row(0) + eigenvalues.row(1)*eigenvectors.row(1) + eigenvalues.row(2)*eigenvectors.row(2);
+  //test = test/3;
+  imshow("avg", norm_0_255(mean.reshape(1,  image.rows)));
 
   waitKey();
 }
