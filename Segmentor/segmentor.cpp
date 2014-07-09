@@ -5,6 +5,7 @@
 #include <iostream>
 #include <sstream>
 #include "segmentor.hpp"
+#include "SLIC/slic.h"
 
 using namespace std;
 using namespace cv;
@@ -17,8 +18,9 @@ const int iter = 7;
 Segmentor::Segmentor(){}
 Segmentor::~Segmentor(){}
 
-
+//=======================================================================================
 void Segmentor::getBinMask( const Mat& comMask, Mat& binMask ){
+//=======================================================================================
   if( comMask.empty() || comMask.type()!=CV_8UC1 ){
     CV_Error( CV_StsBadArg, "comMask is empty or has incorrect type (not CV_8UC1)" );
   }
@@ -27,7 +29,9 @@ void Segmentor::getBinMask( const Mat& comMask, Mat& binMask ){
   }
   binMask = comMask & 1;
 }
+//=======================================================================================
 void Segmentor::showImage( Mat& _img, Mat& _mask){
+//=======================================================================================
   Mat res;
   Mat binMask;
   if( _mask.empty() ){
@@ -39,8 +43,9 @@ void Segmentor::showImage( Mat& _img, Mat& _mask){
   }
   imshow( winName, res );
 }
-
+//=======================================================================================
 void Segmentor::changeImage( Mat& _img, Mat& _mask, Mat& _res){
+//=======================================================================================
   Mat binMask;
   if( _mask.empty() ){
     _img.copyTo( _res );
@@ -51,13 +56,16 @@ void Segmentor::changeImage( Mat& _img, Mat& _mask, Mat& _res){
   }
 }
 
-int Segmentor::segment(char* argv, Mat& _res){
-  
+// filename = path to image file
+// _res = image after segmentation
+//=======================================================================================
+int Segmentor::segment(std::string filename, Mat& _res){
+//=======================================================================================
   Mat image, mask, bgdModel, fgdModel;
   Rect rect;
   
   // Error handling of inputs
-  string filename = argv;
+
   if(filename.empty()){
     return 1;
   }
@@ -74,7 +82,7 @@ int Segmentor::segment(char* argv, Mat& _res){
   // Perform grabcut on
   rect = Rect(Point(10,10), Point(630,470));
   grabCut(image, mask,rect,bgdModel,fgdModel,iter,GC_INIT_WITH_RECT);
-
+  
   changeImage(image, mask, _res);
   // waitKey();
   return 0;

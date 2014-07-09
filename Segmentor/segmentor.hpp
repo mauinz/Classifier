@@ -4,6 +4,7 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <string>
 
 class Segmentor{
 private:
@@ -16,7 +17,7 @@ public:
   // Destructor
   ~Segmentor();
   // Main functionality of the class
-  int segment(char* argv, cv::Mat& res);
+  int segment(std::string filename, cv::Mat& res);
   int getSIFT(char* argv, cv::Mat& _res);
 };
 
