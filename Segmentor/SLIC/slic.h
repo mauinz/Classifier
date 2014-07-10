@@ -29,6 +29,8 @@ using namespace std;
 /* The number of iterations run by the clustering algorithm. */
 #define NR_ITERATIONS 10
 
+
+#define MAXINT 999999
 /*
 * class Slic.
 *
@@ -75,7 +77,16 @@ class Slic {
         void display_contours(IplImage *image, CvScalar colour);
         void colour_with_cluster_means(IplImage *image);
 	void print_clusters(IplImage *image);	
-	void label_pixels(IplImage *image, cv::Mat res);
+
+	/* Custom functions to allow for super pixel manipulation */
+	void label_pixels(IplImage *image, std::map<int,cv::Mat> &spixels);
+	void get_response(IplImage *image,std::map<int,cv::Mat> spixels, cv::Mat &response);
+	
+
+	/* Response helper functions */
+	CvScalar get_mean(cv::Mat image, cv::Mat values);
+	CvScalar get_square(cv::Mat image, cv::Mat values);
+	cv::Mat get_contour(cv::Mat values);
 };
 
 #endif

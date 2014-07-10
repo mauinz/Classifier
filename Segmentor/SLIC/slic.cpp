@@ -387,12 +387,12 @@ void Slic::print_clusters(IplImage *image){
   }
 }
 
-void Slic::label_pixels(IplImage *image, cv::Mat res){
+void Slic::label_pixels(IplImage *image, std::map<int,cv::Mat> & spixels){
   const int dx8[8] = {-1, -1, 0, 1, 1, 1, 0, -1};
   const int dy8[8] = { 0, -1, -1, -1, 0, 1, 1, 1};
 
-  std::map<int,cv::Mat> spixels;
-  cv::Mat test(image->height,image->width, CV_8UC1, cv::Scalar(23));
+
+  //cv::Mat test(image->height,image->width, CV_8UC1, cv::Scalar(23));
   /* Go through all the pixels. */
   for (int i = 0; i < image->width; i++) {
     for (int j = 0; j < image->height; j++) {
@@ -439,6 +439,7 @@ void Slic::label_pixels(IplImage *image, cv::Mat res){
       std::cout << std::endl;
   }
   */
+  /*
   imshow("test",test);
   unsigned char colour = 24;
   cv::waitKey();
@@ -456,6 +457,7 @@ void Slic::label_pixels(IplImage *image, cv::Mat res){
       //test.at<int>(((*it).second).at<int>(i, 1),((*it).second).at<int>(i, 0)) = 200;
     }
   }
+  */
   /*
   for( unsigned int i = 0; i < test.rows; i++ ) {
     for( unsigned int j = 0; j < test.cols; j++ ) {
@@ -465,7 +467,127 @@ void Slic::label_pixels(IplImage *image, cv::Mat res){
     printf("\n");
   }
   */
+  /*
   std::cout << "count: " << count << std::endl;
   imshow("test",test);
   cv::waitKey();
+  */
+}
+
+void Slic::get_response(IplImage *image,std::map<int,cv::Mat> spixels, cv::Mat &response){
+  /*
+  for(map<int,cv::Mat>::iterator it = spixels.begin(); it!= spixels.end(); it++){
+    CvScalar mean = get_mean(image,(*it).second);
+    
+    int size = (*it).second.rows; // size of super pixel
+    
+    for(int i = 0; i < (*it).second.rows; i++){ 
+      CvScalar c1 = cvGet2D(image,((*it).second).at<int>(i, 1),((*it).second).at<int>(i, 0));
+      if(((*it).second).at<int>(i, 2) == 1){
+	
+	//std::cout << "we are true";
+	//std::cout << ((*it).second).at<int>(i, 1) << ":" << ((*it).second).at<int>(i, 0) << " ";
+	//test.at<uchar>(((*it).second).at<int>(i, 1),((*it).second).at<int>(i, 0)) = colour;
+      }
+
+      //test.at<int>(((*it).second).at<int>(i, 1),((*it).second).at<int>(i, 0)) = 200;
+    }
+  }
+  */
+}
+
+CvScalar Slic::get_mean(cv::Mat image, cv::Mat values){
+  
+  CvScalar result;
+  int rows = values.rows;
+  std::cout << "rows: " << rows << std::endl;
+  result.val[0] = 0;
+  result.val[1] = 0;
+  result.val[2] = 0;  
+  
+  for(int i = 0; i < rows;i++){
+    cv::Vec3b colour = image.at<cv::Vec3b>( values.at<int>(i,1), values.at<int>(i,0));
+    //std::cout << "val[1]: " << static_cast<unsigned>(colour[1]) <<std::endl;
+    result.val[0] += colour[0];
+    result.val[1] += colour[1];
+    result.val[2] += colour[2];
+  }
+  
+  result.val[0] /= rows;
+  result.val[1] /= rows;
+  result.val[2] /= rows;
+  return result;
+}
+
+CvScalar Slic::get_square(cv::Mat image, cv::Mat values){
+  CvScalar result;
+  result.val[0] = 0;
+  result.val[1] = 0;
+  result.val[2] = 0;
+  
+  int rows = values.rows;
+
+  for(int i = 0; i < rows;i++){
+    cv::Vec3b colour = image.at<cv::Vec3b>( values.at<int>(i,1), values.at<int>(i,0));
+    result.val[0] += pow(colour[0],2);
+    result.val[1] += pow(colour[1],2);
+    result.val[2] += pow(colour[2],2);
+  }
+  
+  result.val[0] /= rows;
+  result.val[1] /= rows;
+  result.val[2] /= rows;
+  return result;
+}
+
+cv::Mat Slic::get_contour(cv::Mat values){
+  
+  //final 36 values that represent out countor
+  cv::Mat result = cv::Mat::zeros(1,36,CV_32S);
+  int rows = values.rows;
+  double xscale, yscale;
+  int minx = MAXINT, miny = MAXINT, maxx = -1, maxy = -1;
+  
+
+  // Search for boundray terms
+  for(int i = 0; i < rows;i++){
+    if(values.at<int>(i,0) < minx){
+      minx = values.at<int>(i,0);
+    }
+    if(values.at<int>(i,0) > maxx){
+      maxx = values.at<int>(i,0);
+    }
+    if(values.at<int>(i,1) < miny){
+      miny = values.at<int>(i,1);
+    }
+    if(values.at<int>(i,1) > maxy){
+      maxy = values.at<int>(i,1);
+    }
+  }
+  yscale = 5/(double)(maxy-miny);
+  xscale = 5/(double)(maxx-minx);
+  /*
+  for(int i = 0; i < 36; i++){
+    if(i%6 == 0){
+      std::cout << std::endl;
+    }
+    std::cout << result.at<int>(0,i) << " ";
+  }
+  */
+  //std::cout << maxy << std::endl;
+  //std::cout << miny << std::endl;
+
+  double scale = (yscale <= xscale) ? yscale : xscale;
+  for(int i = 0; i < rows;i++){
+    //std::cout << values.at<int>(i,2);
+    if(values.at<int>(i,2) == 1){
+      int xval = round(scale*(values.at<int>(i,0) - minx));
+      int yval = round(scale*(values.at<int>(i,1) - miny));
+      
+      //std::cout << "yval: " << yval << std::endl;
+      result.at<int>(0, xval*6 + yval) = 1;
+    }
+  }
+  
+  return result;
 }
