@@ -3,6 +3,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/nonfree/features2d.hpp>
 #include <opencv2/nonfree.hpp>
+#include <opencv2/nonfree/nonfree.hpp>
 #include <opencv2/ml/ml.hpp>
 #include <boost/filesystem.hpp>
 #include <time.h>
@@ -22,6 +23,8 @@ using namespace cv;
 
 Classifier::Classifier(){}
 Classifier::~Classifier(){}
+
+const int py_level = 3;
 
 template <typename T>
 //=======================================================================================
@@ -51,14 +54,13 @@ int Classifier::getSIFT(const char* argv, cv::Mat& _res){
 int Classifier::getWords(const char * folderpath, int seed, bool verbose = true){
 //=======================================================================================
   // Set up components
+
   cv::initModule_nonfree();
-  Ptr<FeatureDetector > detector(new SiftFeatureDetector(400)); //detector
-  Ptr<DescriptorExtractor > extractor(
-				      new OpponentColorDescriptorExtractor(
-									   Ptr<DescriptorExtractor>(new SiftDescriptorExtractor())
-									   )
-				      );
-  Ptr<DescriptorMatcher > matcher(new BFMatcher); // Brute Force matcher
+  cv::initModule_features2d();
+  
+  Ptr<FeatureDetector> detector =  makePtr<PyramidAdaptedFeatureDetector>(FeatureDetector::create("SIFT"),py_level); //detector
+  Ptr<DescriptorExtractor > extractor = DescriptorExtractor::create("OpponentSIFT"); // Extractor
+  //Ptr<DescriptorMatcher > matcher(new BFMatcher); // Brute Force matcher
   std::vector<cv::KeyPoint> keypoints;
   cv::Mat training_descriptors(0,extractor->descriptorSize(),extractor->descriptorType());
   cv::Mat descriptors;
@@ -303,12 +305,8 @@ void Classifier::trainSVM(std::string vocab_path, std::string train_path, int se
   fs["vocabulary"] >> vocabulary;
   fs.release();	
   
-  Ptr<FeatureDetector > detector(new SurfFeatureDetector()); //detector
-  Ptr<DescriptorExtractor > extractor(
-				      new OpponentColorDescriptorExtractor(
-									   Ptr<DescriptorExtractor>(new SurfDescriptorExtractor())
-									   )
-				      );
+  Ptr<FeatureDetector> detector =  makePtr<PyramidAdaptedFeatureDetector>(FeatureDetector::create("SIFT"),py_level); //detector
+  Ptr<DescriptorExtractor > extractor = DescriptorExtractor::create("OpponentSIFT"); // Extractor
   Ptr<DescriptorMatcher > matcher(new BFMatcher);
   BOWImgDescriptorExtractor bowide(extractor,matcher);
   bowide.setVocabulary(vocabulary);
@@ -382,12 +380,8 @@ void Classifier::extractTrainingData(std::string filepath, std::map<string,Mat>&
   cv::Mat img;
   std::vector<std::vector<string> > seed;
   load2Dvector(seed,filepath);
-  Ptr<FeatureDetector > detector(new SiftFeatureDetector(400)); //detector
-  Ptr<DescriptorExtractor > extractor(
-				      new OpponentColorDescriptorExtractor(
-									   Ptr<DescriptorExtractor>(new SiftDescriptorExtractor())
-									   )
-				      );
+  Ptr<FeatureDetector> detector =  makePtr<PyramidAdaptedFeatureDetector>(FeatureDetector::create("SIFT"),py_level); //detector
+  Ptr<DescriptorExtractor > extractor = DescriptorExtractor::create("OpponentSIFT"); // Extractor
   Ptr<DescriptorMatcher > matcher(new BFMatcher);
   BOWImgDescriptorExtractor bowide(extractor,matcher);
   bowide.setVocabulary(vocabulary);
@@ -421,12 +415,8 @@ void Classifier::testSVM(std::string seed_path, std::string vocab_path, std::str
   vector<string> classes; //load up with the respective classes
   std::vector<std::vector<string> > test_images;
   load2Dvector(test_images, seed_path);
-  Ptr<FeatureDetector > detector(new SiftFeatureDetector(400)); //detector
-  Ptr<DescriptorExtractor > extractor(
-				      new OpponentColorDescriptorExtractor(
-									   Ptr<DescriptorExtractor>(new SiftDescriptorExtractor())
-									   )
-				      );
+  Ptr<FeatureDetector> detector =  makePtr<PyramidAdaptedFeatureDetector>(FeatureDetector::create("SIFT"),py_level); //detector
+  Ptr<DescriptorExtractor > extractor = DescriptorExtractor::create("OpponentSIFT"); // Extractor
   Ptr<DescriptorMatcher > matcher(new BFMatcher);
   BOWImgDescriptorExtractor bowide(extractor,matcher);
 

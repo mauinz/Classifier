@@ -17,8 +17,8 @@ int main(){
   return 0;
   */
   
-  // getVocab() TEST
-  /*
+  // getWords() TEST
+  ///*
   Classifier* myclas = new Classifier;
   //for testing purposes use:
   //"/home/matthew/Documents/Data/UK-Leps.images/Boloria-selene/"
@@ -26,7 +26,7 @@ int main(){
   myclas->getWords("/home/matthew/Documents/classifier/Classifier/Seeds/test_seed_1", 1, true);
   delete myclas;
   return 0;
-  */
+  //*/
   // makeFileList() TEST
   /*
   Classifier* myclas = new Classifier;
@@ -47,13 +47,13 @@ int main(){
   */
   
   // Setting up SVM TEST
-  ///*
+  /*
   Classifier* myclas = new Classifier;
   myclas->trainSVM("/home/matthew/Documents/classifier/Classifier/Vocabularies/Vocabulary_1_2014-07-04.11:08:13.yml",
 		   "/home/matthew/Documents/classifier/Classifier/Seeds/test_seed_1", 1);
   delete myclas;
   return 0;
-  //*/
+  */
   // Testing SVM results
   /*
   Classifier* myclas = new Classifier;
