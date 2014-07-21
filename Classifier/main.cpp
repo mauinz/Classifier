@@ -51,22 +51,22 @@ int main(){
   */
   
   // Setting up SVM TEST
-  ///*
+  /*
   Classifier* myclas = new Classifier;
   myclas->trainSVM("/home/matthew/Documents/classifier/Classifier/Vocabularies/Vocabulary_1_2014-07-16.18:03:34.yml",
 		   "/home/matthew/Documents/classifier/Classifier/Seeds/test_seed_1", 1);
   delete myclas;
   return 0;
-  //*/
+  */
 
 
   // Testing SVM results
-  /*
+  ///*
   Classifier* myclas = new Classifier;
   myclas->testSVM("/home/matthew/Documents/classifier/Classifier/Seeds/test_seed_1",
 		  "/home/matthew/Documents/classifier/Classifier/Vocabularies/Vocabulary_1_2014-07-16.18:03:34.yml",
-		  "/home/matthew/Documents/classifier/Classifier/SVMS");
+		  "/home/matthew/Documents/classifier/Classifier/SVMS_12014-07-21.15:24:11",1);
   delete myclas;
   return 0;
-  */
+  //*/
 }

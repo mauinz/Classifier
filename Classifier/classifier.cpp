@@ -331,7 +331,7 @@ void Classifier::trainSVM(std::string vocab_path, std::string train_path, int se
   tstruct = *localtime(&now);
   strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &tstruct);
   stringstream folder_name;
-  folder_name << "SVMS_" << buf;
+  folder_name << "SVMS_" << to_string(seed) << buf;
   boost::filesystem::create_directories(folder_name.str());
   for (unsigned int i=0;i<class_names.size();i++) {
     string class_ = class_names[i];
