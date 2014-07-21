@@ -2,7 +2,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/nonfree/features2d.hpp>
-#include <opencv2/nonfree.hpp>
+//#include <opencv2/nonfree.hpp>
 #include <opencv2/nonfree/nonfree.hpp>
 #include <opencv2/ml/ml.hpp>
 #include <boost/filesystem.hpp>
@@ -37,7 +37,7 @@ std::string to_string(T value){
 //=======================================================================================
 int Classifier::getSIFT(const char* argv, cv::Mat& _res){
 //=======================================================================================
-    const cv::Mat input = cv::imread(argv, 0);
+  const cv::Mat input = cv::imread(argv, 0);
 
     cv::SiftFeatureDetector detector;
     std::vector<cv::KeyPoint> keypoints;
@@ -362,7 +362,7 @@ void Classifier::trainSVM(std::string vocab_path, std::string train_path, int se
     
     stringstream ss;
     ss << "SVMS_" << to_string(seed) << buf << "/SVM_classifier_";
-    ss << buf << "~";
+    ss << buf << "+";
     ss << class_ << ".yml";
     cout << "Saving as: " << ss.str() << endl;
     classifier.save(ss.str().c_str());
@@ -434,7 +434,7 @@ void Classifier::testSVM(std::string seed_path, std::string vocab_path, std::str
     if(boost::filesystem::is_regular_file(*dir)){
       std::cout << "Reading: " << dir->path().string() << std::endl;
       vector<std::string> tmp_line;
-      boost::split(tmp_line,dir->path().string(), boost::is_any_of("~"));
+      boost::split(tmp_line,dir->path().string(), boost::is_any_of("+"));
       
       std::string class_name = tmp_line[1].substr(0, tmp_line[1].size()-4);
 
