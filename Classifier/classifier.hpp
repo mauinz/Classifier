@@ -29,6 +29,7 @@ public:
   void extractTrainingData(std::string filepath, std::map<std::string,cv::Mat>& classes_training_data, cv::Mat vocabulary);
   void trainSVM(std::string vocab_path, std::string train_path, int seed);
   void testSVM(std::string seed_path, std::string vocab_path, std::string svm_path, int seed);
+  void getHist(cv::Mat src, cv::Mat &res, bool verbose = false);
 };
 
 #endif
