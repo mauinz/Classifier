@@ -450,14 +450,17 @@ void Classifier::testSVM(std::string seed_path, std::string vocab_path, std::str
 
   for(unsigned int i = 0; i < test_images.size(); i++) {
     if(test_images[i][2] == "test"){
-      Mat img = imread(test_images[i][0]), response_hist;      
+      Mat img = imread(test_images[i][0]), response_hist, colour_hist,full_hist;      
       vector<KeyPoint> keypoints;
       detector->detect(img,keypoints);
       bowide.compute(img, keypoints, response_hist);
-    
+      getHist(img,colour_hist);
+      colour_hist.convertTo(colour_hist,response_hist.type());
+      hconcat(response_hist,colour_hist,full_hist);
+
       float minf = FLT_MAX; string minclass;
       for (map<string,unique_ptr<CvSVM>>::iterator it = classes_classifiers.begin(); it != classes_classifiers.end(); ++it) {
-	float res = (*it).second->predict(response_hist,true);
+	float res = (*it).second->predict(full_hist,true);
 	if (res < minf) {
 	  minf = res;
 	  minclass = (*it).first;
