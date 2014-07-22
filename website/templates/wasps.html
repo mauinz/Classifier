@@ -1,0 +1,41 @@
+{% extends "template.html" %}
+{% block content %}
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>Wasp Classification</h1>
+    <p>Simply choose an image to upload and press classify</p>
+  </div>
+</div>
+
+
+<div class="container">
+  <!-- Example row of columns -->
+  
+  <div class="col-md-4">
+    <form action="butterflies" method="post" enctype="multipart/form-data">
+      
+      <!-- Basic imput system for original testing
+      <input type="file" name="file"><br /><br />
+      <input type="submit" value="Upload">
+      -->
+      
+      <div class="fileinput fileinput-new" data-provides="fileinput">
+	<div class="fileinput-preview thumbnail" data-trigger="fileinput" style="width: 200px; height: 150px;" id="element"></div>
+	<div>
+	  <span class="btn btn-default btn-file"><span class="fileinput-new">Select image</span><span class="fileinput-exists">Change</span><input type="file" name="file"></span>
+	  <a href="#" class="btn btn-default fileinput-exists" data-dismiss="fileinput">Remove</a>
+	  <input class="btn btn-default fileinput-exists" type="submit" value="Classify">
+	</div>
+      </div>
+     
+    </form> 
+  </div>
+</div> <!--/container -->
+
+<div class="container">
+  <div class="col-md-4">
+    <p> Still under construction </p>
+  </div>
+</div> <!--/container -->
+{% endblock %}

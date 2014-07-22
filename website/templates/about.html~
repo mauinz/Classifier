@@ -1,0 +1,44 @@
+{% extends "template.html" %}
+{% block content %}
+<div class="jumbotron">
+  <div class="container">
+    <h1>About The Project</h1>
+  </div>
+</div>
+
+<!-- Main contents of page -->
+<div class="container">
+  <!-- Example row of columns -->
+  <div class="row">
+    <div class="col-md-8">
+      <h2>Current Goals</h2>
+      <p>This site is a front end for a butterfly classification system developed under the supervision of Doctor Benjamin Glocker at Imperial College London as part of my MSc in Computing Science. Using a web based front end allows for flexibility and easy cross platform support. The original project proposal is included below for completeness but in its current form, the project is very different. Namely I have decided to build the identification system which uses a bag of words with spatial pyramids approach to be as flexible as possible. The end product in mind is a frame work which will eventually be made public to allow others to build simple robust identification systems with minimal effort.</p>
+    </div>
+  </div>
+</div> <!-- /container -->
+
+
+<div class="container">
+  <!-- Example row of columns -->
+  <div class="row">
+    <div class="col-md-8">
+      <h2>Description of project as proposed by B. Glocker</h2>
+      <p>The goal of this project is to develop a software tool for automatic identification of fossils and insects from photographs. Such a tool could greatly support taxonomists in classification of existing and discovery of new species. The automatic identification will be achieved by implementing a robust image processing pipeline with takes elements from pattern recognition and machine learning into account. Based on discriminative feature extraction and supervised clustering techniques the software should be able to classify a given photograph with high accuracy.</p>
+      
+      <p>The software will be implemented either in Matlab or C++ using the OpenCV library (depending on the student's expierence). Knowledge in image processing, computer vision, and machine learning/artificial intelligence are beneficial.</p>
+      
+      <p>This project is in collaboration with Prof. Norman MacLeod from the National History Museum London.</p> 
+    </div>
+  </div>
+</div> <!-- /container -->
+
+
+ 
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+
+    <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></\
+script> -->
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <!-- <script src="js/bootstrap.min.js"></script> -->
+  {% endblock %}
