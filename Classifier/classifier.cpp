@@ -3,7 +3,6 @@
 #include <opencv/highgui.h>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/nonfree/features2d.hpp>
-//#include <opencv2/nonfree.hpp>
 #include <opencv2/nonfree/nonfree.hpp>
 #include <opencv2/ml/ml.hpp>
 #include <boost/filesystem.hpp>
@@ -15,6 +14,7 @@
 #include <iomanip>
 #include <boost/algorithm/string.hpp>
 #include "classifier.hpp"
+#include "../Segmentor/segmentor.hpp"
 #include <boost/lambda/bind.hpp>
 #include <memory>
 #include <map>
@@ -374,6 +374,7 @@ void Classifier::trainSVM(std::string vocab_path, std::string train_path, int se
 void Classifier::extractTrainingData(std::string filepath, std::map<string,Mat>& classes_training_data, cv::Mat vocabulary){
 //=======================================================================================
   cv::initModule_nonfree();
+  Segmentor * myseg = new Segmentor;
   cout << "Extracting Training Data" << endl;
   cout << "Reading seed information from file: "<< filepath <<endl;
   vector<KeyPoint> keypoints;
@@ -393,7 +394,7 @@ void Classifier::extractTrainingData(std::string filepath, std::map<string,Mat>&
       img = imread(seed[i][0]);
       detector->detect(img,keypoints);
       bowide.compute(img, keypoints, response_hist);
-      getHist(img,colour_hist);
+      getHist(img,colour_hist,myseg);
       colour_hist.convertTo(colour_hist,response_hist.type());
       if(classes_training_data.count(seed[i][1]) == 0) { //not yet created...
 	classes_training_data[seed[i][1]].create(0,(response_hist.cols + colour_hist.cols),response_hist.type());
@@ -403,7 +404,7 @@ void Classifier::extractTrainingData(std::string filepath, std::map<string,Mat>&
       
     }
   }
-
+  delete myseg;
 }
 // seed_path  = Path to seed file
 // vocav_path = Path to vocabulary file
@@ -411,6 +412,7 @@ void Classifier::extractTrainingData(std::string filepath, std::map<string,Mat>&
 //=======================================================================================
 void Classifier::testSVM(std::string seed_path, std::string vocab_path, std::string svm_path, int seed){
 //=======================================================================================
+  Segmentor * myseg = new Segmentor;
   cv::initModule_nonfree();
   float count = 0, correct = 0;
   map<string,map<string,int> > confusion_matrix; // confusionMatrix[classA][classB] = number_of_times_A_voted_for_B;
@@ -454,7 +456,7 @@ void Classifier::testSVM(std::string seed_path, std::string vocab_path, std::str
       vector<KeyPoint> keypoints;
       detector->detect(img,keypoints);
       bowide.compute(img, keypoints, response_hist);
-      getHist(img,colour_hist);
+      getHist(img,colour_hist,myseg);
       colour_hist.convertTo(colour_hist,response_hist.type());
       hconcat(response_hist,colour_hist,full_hist);
 
@@ -492,17 +494,23 @@ void Classifier::testSVM(std::string seed_path, std::string vocab_path, std::str
     }
   }
   myfile.close();
+
+  delete myseg;
 }
 
 //=======================================================================================
-void Classifier::getHist(cv::Mat src, cv::Mat &res, bool verbose){
+void Classifier::getHist(cv::Mat src, cv::Mat &res, Segmentor* myseg, bool verbose){
 //=======================================================================================
-  Mat dst, tmp;
+  Mat dst, tmp, mask;
+
+  // Get mask from segmentor
+
+  myseg->getMask(src, mask);
 
   /// Separate the image in 3 places ( B, G and R )
   vector<Mat> bgr_planes;
   split( src, bgr_planes );
-
+  
   /// Establish the number of bins
   int histSize = 10;
 
@@ -515,16 +523,16 @@ void Classifier::getHist(cv::Mat src, cv::Mat &res, bool verbose){
   Mat b_hist, g_hist, r_hist;
 
   /// Compute the histograms:
-  calcHist( &bgr_planes[0], 1, 0, Mat(), b_hist, 1, &histSize, &histRange, uniform, accumulate );
-  calcHist( &bgr_planes[1], 1, 0, Mat(), g_hist, 1, &histSize, &histRange, uniform, accumulate );
-  calcHist( &bgr_planes[2], 1, 0, Mat(), r_hist, 1, &histSize, &histRange, uniform, accumulate );
+  calcHist( &bgr_planes[0], 1, 0, mask, b_hist, 1, &histSize, &histRange, uniform, accumulate );
+  calcHist( &bgr_planes[1], 1, 0, mask, g_hist, 1, &histSize, &histRange, uniform, accumulate );
+  calcHist( &bgr_planes[2], 1, 0, mask, r_hist, 1, &histSize, &histRange, uniform, accumulate );
 
   // Concatenate the histograms
   vconcat(b_hist,g_hist,tmp);
   vconcat(tmp,r_hist,tmp);
   transpose(tmp,res);
 
-
+  // Verbose used for testing purposes
   if(verbose == true){
     // Draw the histograms for B, G and R
     int hist_w = 512; int hist_h = 400;

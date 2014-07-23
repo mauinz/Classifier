@@ -1,9 +1,20 @@
 #include "classifier.hpp"
+#include "../Segmentor/segmentor.hpp"
 #include <iostream>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
+
+
 int main(){
+  
+  std::string seed_file = "/home/matthew/Documents/classifier/Classifier/Seeds/test_seed_1";
+  std::string vocab_file = "/home/matthew/Documents/classifier/Classifier/Vocabularies/Vocabulary_1_2014-07-16.18:03:34.yml";
+  std::string svm_file =  "/home/matthew/Documents/classifier/Classifier/SVMS_12014-07-22.17:25:13";
+  std::string test_image = "/home/matthew/Documents/classifier/Classifier/image.tif";
+  std::string test_image_2 = "/home/matthew/Desktop/1913939_253854910507_7156307_n.jpg";
+  int seed = 1;
+  
 
   //SIFT TEST
   /*
@@ -52,35 +63,36 @@ int main(){
   */
   
   // Setting up SVM TEST
-  /*
+  
   Classifier* myclas = new Classifier;
-  myclas->trainSVM("/home/matthew/Documents/classifier/Classifier/Vocabularies/Vocabulary_1_2014-07-16.18:03:34.yml",
-		   "/home/matthew/Documents/classifier/Classifier/Seeds/test_seed_1", 1);
+  myclas->trainSVM(vocab_file,seed_file,seed);
   delete myclas;
   return 0;
-  */
+  
 
 
   // Testing SVM results
-  ///*
+  /*
   Classifier* myclas = new Classifier;
   myclas->testSVM("/home/matthew/Documents/classifier/Classifier/Seeds/test_seed_1",
 		  "/home/matthew/Documents/classifier/Classifier/Vocabularies/Vocabulary_1_2014-07-16.18:03:34.yml",
 		  "/home/matthew/Documents/classifier/Classifier/SVMS_12014-07-22.17:25:13",1);
   delete myclas;
   return 0;
-  //*/
+  */
 
   // Testing histogram
   
   /*
   cv::Mat src,res;
-  src = cv::imread("/home/matthew/Documents/classifier/Classifier/image.tif");
+  src = cv::imread(test_image);
   Classifier* myclas = new Classifier;
-  myclas->getHist(src,res);
+  Segmentor* myseg = new Segmentor;
+  myclas->getHist(src,res,myseg,true);
   std::cout << "rows:" << res.rows << std::endl;
   std::cout << "cols:" << res.cols << std::endl;
   delete myclas;
+  delete myseg;
   return 0;
   */
 }
