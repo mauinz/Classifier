@@ -87,17 +87,25 @@ int Segmentor::segment(std::string filename, Mat& _res){
   // waitKey();
   return 0;
 }
-/*
-int Segmentor::getSIFT(char* argv, cv::Mat& _res){
-    const cv::Mat input = cv::imread(argv, 0);
-    initModule_nonfree();
 
-    cv::SiftFeatureDetector detector;
-    std::vector<cv::KeyPoint> keypoints;
-    detector.detect(input, keypoints);
+//=======================================================================================
+void Segmentor::getMask(cv::Mat& image, cv::Mat& mask){
+//=======================================================================================
+  Mat comMask, bgdModel, fgdModel;
+  Rect rect;
+  
+  
+  // Show image to user and wait for click
+  // imshow(winName, image);
+  // waitKey();
 
-    // Add results to image and save.
-    cv::drawKeypoints(input, keypoints, _res);
-
-    return 0;
-}*/
+  // Perform grabcut on
+  rect = Rect(Point(10,10), Point(630,470));
+  grabCut(image, comMask,rect,bgdModel,fgdModel,iter,GC_INIT_WITH_RECT);
+  getBinMask(comMask,mask);
+  //imshow(winName,mask);
+  //std::cout <<"GC_BGD:"<< GC_BGD << std::endl;
+  //changeImage(image, mask, _res);
+  //waitKey();
+  //return 0;
+}

@@ -19,6 +19,7 @@ public:
   // Main functionality of the class
   int segment(std::string filename, cv::Mat& res);
   int getSIFT(char* argv, cv::Mat& _res);
+  void getMask(cv::Mat& image, cv::Mat& mask);
 };
 
 #endif
