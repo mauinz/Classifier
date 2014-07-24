@@ -512,7 +512,7 @@ void Classifier::getHist(cv::Mat src, cv::Mat &res, Segmentor* myseg, bool verbo
   split( src, bgr_planes );
   
   /// Establish the number of bins
-  int histSize = 10;
+  int histSize = 30;
 
   /// Set the ranges ( for B,G,R) )
   float range[] = { 0, 256 } ;
