@@ -1,3 +1,4 @@
+#include <boost/python.hpp>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv/highgui.h>
@@ -26,6 +27,7 @@ Classifier::Classifier(){}
 Classifier::~Classifier(){}
 
 const int py_level = 3;
+const bool use_hist = false;
 
 template <typename T>
 //=======================================================================================
@@ -502,7 +504,7 @@ void Classifier::testSVM(std::string seed_path, std::string vocab_path, std::str
 void Classifier::getHist(cv::Mat src, cv::Mat &res, Segmentor* myseg, bool verbose){
 //=======================================================================================
   Mat dst, tmp, mask;
-
+  res.release();
   // Get mask from segmentor
 
   myseg->getMask(src, mask);
@@ -526,7 +528,11 @@ void Classifier::getHist(cv::Mat src, cv::Mat &res, Segmentor* myseg, bool verbo
   calcHist( &bgr_planes[0], 1, 0, mask, b_hist, 1, &histSize, &histRange, uniform, accumulate );
   calcHist( &bgr_planes[1], 1, 0, mask, g_hist, 1, &histSize, &histRange, uniform, accumulate );
   calcHist( &bgr_planes[2], 1, 0, mask, r_hist, 1, &histSize, &histRange, uniform, accumulate );
-
+  
+  normalize(b_hist, b_hist, 0, 1, NORM_MINMAX, -1, Mat() );
+  normalize(g_hist, g_hist, 0, 1, NORM_MINMAX, -1, Mat() );
+  normalize(r_hist, r_hist, 0, 1, NORM_MINMAX, -1, Mat() );
+  
   // Concatenate the histograms
   vconcat(b_hist,g_hist,tmp);
   vconcat(tmp,r_hist,tmp);
@@ -541,10 +547,10 @@ void Classifier::getHist(cv::Mat src, cv::Mat &res, Segmentor* myseg, bool verbo
     Mat histImage( hist_h, hist_w, CV_8UC3, Scalar( 0,0,0) );
     
     /// Normalize the result to [ 0, histImage.rows ]
+    
     normalize(b_hist, b_hist, 0, histImage.rows, NORM_MINMAX, -1, Mat() );
     normalize(g_hist, g_hist, 0, histImage.rows, NORM_MINMAX, -1, Mat() );
     normalize(r_hist, r_hist, 0, histImage.rows, NORM_MINMAX, -1, Mat() );
-    
     
   
     /// Draw for each channel
@@ -570,4 +576,16 @@ void Classifier::getHist(cv::Mat src, cv::Mat &res, Segmentor* myseg, bool verbo
   }
 
 
+}
+char const* greet()
+{
+  return "hello, world";
+}
+ 
+
+ 
+BOOST_PYTHON_MODULE(hello_ext)
+{
+  using namespace boost::python;
+  def("greet", greet);
 }
