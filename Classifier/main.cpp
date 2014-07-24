@@ -72,16 +72,16 @@ int main(){
 
 
   // Testing SVM results
-  /*
+  
   Classifier* myclas = new Classifier;
   myclas->testSVM(seed_file,vocab_file,svm_file,seed);
   delete myclas;
   return 0;
-  */
+  
 
   // Testing histogram
   
-  
+  /*
   cv::Mat src,res;
   src = cv::imread(test_image);
   Classifier* myclas = new Classifier;
@@ -92,5 +92,5 @@ int main(){
   delete myclas;
   delete myseg;
   return 0;
-  
+  */
 }
