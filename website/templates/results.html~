@@ -1,0 +1,18 @@
+{% extends "template.html" %}
+{% block content %}
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>Butterfly Classification</h1>
+    <p>Results of classification</p>
+  </div>
+</div>
+
+<div class="row">
+  <div class="span2" style="float: none; margin: 0 auto;">
+    <img src = {{filename}} class="img-thumbnail"><br>
+    <br> <br>
+    <p>Classification: {{res}} </p>
+  </div>
+</div>
+{% endblock %}
