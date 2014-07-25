@@ -373,12 +373,14 @@ void Classifier::trainSVM(std::string vocab_path, std::string train_path, int se
 }
 
 //=======================================================================================
-void Classifier::extractTrainingData(std::string filepath, std::map<string,Mat>& classes_training_data, cv::Mat vocabulary){
+void Classifier::extractTrainingData(std::string filepath, std::map<string,Mat>& classes_training_data, cv::Mat vocabulary,bool verbose ){
 //=======================================================================================
   cv::initModule_nonfree();
   Segmentor * myseg = new Segmentor;
-  cout << "Extracting Training Data" << endl;
-  cout << "Reading seed information from file: "<< filepath <<endl;
+  if(verbose){
+    cout << "Extracting Training Data" << endl;
+    cout << "Reading seed information from file: "<< filepath <<endl;
+  }
   vector<KeyPoint> keypoints;
   cv::Mat response_hist, colour_hist,full_hist;
   cv::Mat img;
@@ -602,7 +604,6 @@ std::string classify(std::string svm_path, std::string vocab_path, std::string i
   for ( boost::filesystem::recursive_directory_iterator end, dir(svm_path); 
 	dir != end; ++dir ) {
     if(boost::filesystem::is_regular_file(*dir)){
-      std::cout << "Reading: " << dir->path().string() << std::endl;
       vector<std::string> tmp_line;
       boost::split(tmp_line,dir->path().string(), boost::is_any_of("+"));
       
@@ -631,32 +632,6 @@ std::string classify(std::string svm_path, std::string vocab_path, std::string i
       minclass = (*it).first;
     }
   }
-  //std::cout << "Case: " << test_images[i][1] << " MinClass prediction: " << minclass << std::endl;
-  //if(test_images[i][1] == minclass){
-  //correct++;
-  //    }
-  //    count++;
-  //    confusion_matrix[minclass][test_images[i][1]]++; 
-  //  }
-  //}
-  //std::cout << "Total Accuracy: " << (correct/count)*100 << "%" << std::endl;
-  
-  //ofstream myfile;
-
-  //std::string save_name = "Confusions/cm_";
-  //save_name += to_string(seed);
-  //myfile.open(save_name.c_str());
-
-  //std::cout << "------------------Confusion Matix------------------" << std::endl;
-  //for(map<string,map<string,int> >::iterator it = confusion_matrix.begin(); it != confusion_matrix.end(); ++it) {
-  //  myfile << (*it).first << " -> ";
-  //  cout << (*it).first << " -> ";
-  //  for(map<string,int>::iterator it1 = (*it).second.begin(); it1 != (*it).second.end(); ++it1) {
-  //    myfile << (*it1).first << ":" << (*it1).second << endl;
-  //    cout << (*it1).first << ":" << (*it1).second << endl;
-  //  }
-  //}
-  //myfile.close();
 
   delete myseg;
   delete myclas;

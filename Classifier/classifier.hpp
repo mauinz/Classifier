@@ -27,7 +27,7 @@ public:
   void print2Dvector(std::vector<std::vector<std::string> > print);
   void save2Dvector(std::vector<std::vector<std::string> > print, int seed);
   void load2Dvector(std::vector<std::vector<std::string> > &print,std::string file_path);
-  void extractTrainingData(std::string filepath, std::map<std::string,cv::Mat>& classes_training_data, cv::Mat vocabulary);
+  void extractTrainingData(std::string filepath, std::map<std::string,cv::Mat>& classes_training_data, cv::Mat vocabulary, bool verbose = true);
   void trainSVM(std::string vocab_path, std::string train_path, int seed);
   void testSVM(std::string seed_path, std::string vocab_path, std::string svm_path, int seed);
   void getHist(cv::Mat src, cv::Mat &res, Segmentor* myseg, bool verbose = false);
