@@ -28,7 +28,7 @@ Classifier::~Classifier(){}
 
 const int py_level = 3;
 const bool use_hist = false;
-
+const float hist_factor = 0.2;
 template <typename T>
 //=======================================================================================
 std::string to_string(T value){
@@ -397,13 +397,19 @@ void Classifier::extractTrainingData(std::string filepath, std::map<string,Mat>&
     if(seed[i][2] == "train"){
       img = imread(seed[i][0]);
       detector->detect(img,keypoints);
-      bowide.compute(img, keypoints, response_hist);
-      getHist(img,colour_hist,myseg);
-      colour_hist.convertTo(colour_hist,response_hist.type());
-      if(classes_training_data.count(seed[i][1]) == 0) { //not yet created...
-	classes_training_data[seed[i][1]].create(0,(response_hist.cols + colour_hist.cols),response_hist.type());
+      if(use_hist){
+	bowide.compute(img, keypoints, response_hist);
+	getHist(img,colour_hist,myseg);
+	colour_hist.convertTo(colour_hist,response_hist.type());
+	hconcat(response_hist,colour_hist,full_hist);
       }
-      hconcat(response_hist,colour_hist,full_hist);
+      else{
+	bowide.compute(img, keypoints, full_hist);
+      }
+      if(classes_training_data.count(seed[i][1]) == 0) { //not yet created...
+	classes_training_data[seed[i][1]].create(0,(full_hist.cols),full_hist.type());
+      }
+      
       classes_training_data[seed[i][1]].push_back(full_hist);
       
     }
@@ -459,11 +465,15 @@ void Classifier::testSVM(std::string seed_path, std::string vocab_path, std::str
       Mat img = imread(test_images[i][0]), response_hist, colour_hist,full_hist;      
       vector<KeyPoint> keypoints;
       detector->detect(img,keypoints);
-      bowide.compute(img, keypoints, response_hist);
-      getHist(img,colour_hist,myseg);
-      colour_hist.convertTo(colour_hist,response_hist.type());
-      hconcat(response_hist,colour_hist,full_hist);
-
+      if(use_hist){
+	bowide.compute(img, keypoints, response_hist);
+	getHist(img,colour_hist,myseg);
+	colour_hist.convertTo(colour_hist,response_hist.type());
+	hconcat(response_hist,colour_hist,full_hist);
+      }
+      else{
+	bowide.compute(img, keypoints, full_hist);
+      }
       float minf = FLT_MAX; string minclass;
       for (map<string,unique_ptr<CvSVM>>::iterator it = classes_classifiers.begin(); it != classes_classifiers.end(); ++it) {
 	float res = (*it).second->predict(full_hist,true);
@@ -531,14 +541,17 @@ void Classifier::getHist(cv::Mat src, cv::Mat &res, Segmentor* myseg, bool verbo
   calcHist( &bgr_planes[1], 1, 0, mask, g_hist, 1, &histSize, &histRange, uniform, accumulate );
   calcHist( &bgr_planes[2], 1, 0, mask, r_hist, 1, &histSize, &histRange, uniform, accumulate );
   
-  normalize(b_hist, b_hist, 0, 1, NORM_MINMAX, -1, Mat() );
-  normalize(g_hist, g_hist, 0, 1, NORM_MINMAX, -1, Mat() );
-  normalize(r_hist, r_hist, 0, 1, NORM_MINMAX, -1, Mat() );
+  //normalize(b_hist, b_hist, 0, 1, NORM_MINMAX, -1, Mat() );
+  //normalize(g_hist, g_hist, 0, 1, NORM_MINMAX, -1, Mat() );
+  //normalize(r_hist, r_hist, 0, 1, NORM_MINMAX, -1, Mat() );
   
   // Concatenate the histograms
   vconcat(b_hist,g_hist,tmp);
   vconcat(tmp,r_hist,tmp);
-  transpose(tmp,res);
+
+  transpose(tmp,tmp);
+
+  normalize(tmp,res,0,hist_factor,NORM_MINMAX,-1,Mat());
 
   // Verbose used for testing purposes
   if(verbose == true){
@@ -618,12 +631,17 @@ std::string classify(std::string svm_path, std::string vocab_path, std::string i
 
   Mat img = imread(img_src), response_hist, colour_hist,full_hist;      
   vector<KeyPoint> keypoints;
-  detector->detect(img,keypoints);
-  bowide.compute(img, keypoints, response_hist);
-  myclas->getHist(img,colour_hist,myseg);
-  colour_hist.convertTo(colour_hist,response_hist.type());
-  hconcat(response_hist,colour_hist,full_hist);
-
+  if(use_hist){
+    detector->detect(img,keypoints);
+    bowide.compute(img, keypoints, response_hist);
+    myclas->getHist(img,colour_hist,myseg);
+    colour_hist.convertTo(colour_hist,response_hist.type());
+    hconcat(response_hist,colour_hist,full_hist);
+  }
+  else{
+    detector->detect(img,keypoints);
+    bowide.compute(img, keypoints, full_hist);
+  }
   float minf = FLT_MAX; string minclass;
   for (map<string,unique_ptr<CvSVM>>::iterator it = classes_classifiers.begin(); it != classes_classifiers.end(); ++it){
     float res = (*it).second->predict(full_hist,true);
