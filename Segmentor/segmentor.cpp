@@ -109,3 +109,4 @@ void Segmentor::getMask(cv::Mat& image, cv::Mat& mask){
   //waitKey();
   //return 0;
 }
+

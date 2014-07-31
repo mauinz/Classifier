@@ -8,7 +8,7 @@
 const std::string winName = "Image";
 
 int main(){
-  
+  /*
   Segmentor *mySeg = new Segmentor;
   cv::Mat res,image,crap;
   std::map<int,cv::Mat> spixels;
@@ -63,5 +63,15 @@ int main(){
   
   delete mySeg;
   return 0;
+  */
+  Segmentor *mySeg = new Segmentor;
+  cv::Mat img = cv::imread("../Grabcut/binmask.jpg",0), mask;
+  imshow(winName,img);
+  cv::waitKey(0);
+  mySeg->getMask(img,mask);
+  imshow(winName,mask);
+  cout << img.at<uchar>(0, 0) <<std::endl;
+  cout << img.at<uchar>(200, 200) << std::endl;
 
+  cv::waitKey(0);
 }
