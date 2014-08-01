@@ -6,91 +6,79 @@
 
 
 
-int main(){
+int main(int argc,  char** argv){
   
+  std::string img_folder = "/home/matthew/Documents/Data/UK-Leps.images";
   std::string seed_file = "/home/matthew/Documents/classifier/Classifier/Seeds/test_seed_1";
+  std::string sf2 = "/home/matthew/Documents/classifier/Classifier/Seeds/test_seed_2";
+  std::string sf3 = "/home/matthew/Documents/classifier/Classifier/Seeds/test_seed_3";
+  std::string sf4 = "/home/matthew/Documents/classifier/Classifier/Seeds/test_seed_4";
+  std::string sf5 = "/home/matthew/Documents/classifier/Classifier/Seeds/test_seed_5";
   std::string vocab_file = "/home/matthew/Documents/classifier/Classifier/Vocabularies/Vocabulary_1_2014-07-16.18:03:34.yml";
   std::string svm_file =  "/home/matthew/Documents/classifier/Classifier/SVMS_12014-08-01.12:33:55";
   std::string test_image = "/home/matthew/Documents/classifier/Classifier/image.tif";
   std::string test_image_2 = "/home/matthew/Desktop/1913939_253854910507_7156307_n.jpg";
+  bool verbose = false;
   int seed = 1;
   
-
-  //SIFT TEST
-  /*
   Classifier* myclas = new Classifier;
-  cv::Mat res;
-  myclas->getSIFT("image.tif", res);
 
-  cv::namedWindow( "Display window", cv::WINDOW_AUTOSIZE );
-  cv::imshow("Display window", res);
-  cv::waitKey();
-  delete myclas;
-  return 0;
-  */
+  if(argc == 1){
+    return 0;
+  }
+  
+  if(argc > 2){
+    if(((std::string)"verbose").compare(argv[2]) == 0){
+      verbose = true;
+    }
+  }
   
   // getWords() TEST
-  /*
-  Classifier* myclas = new Classifier;
-  //for testing purposes use:
-  //"/home/matthew/Documents/Data/UK-Leps.images/Boloria-selene/"
-  //myclas->getWords("/home/matthew/Documents/Data/UK-Leps.images");
-  myclas->getWords("/home/matthew/Documents/classifier/Classifier/Seeds/test_seed_1", 1, true);
-  delete myclas;
-  return 0;
-  */
-
-
+  if(((std::string)"getWords").compare(argv[1]) == 0){
+    myclas->getWords(seed_file, seed, verbose);
+  }
+  
   // makeFileList() TEST
-  /*
-  Classifier* myclas = new Classifier;
-  myclas->makeFileList("/home/matthew/Documents/Data/UK-Leps.images",1);
-  myclas->makeFileList("/home/matthew/Documents/Data/UK-Leps.images",2);
-  myclas->makeFileList("/home/matthew/Documents/Data/UK-Leps.images",3);
-  myclas->makeFileList("/home/matthew/Documents/Data/UK-Leps.images",4);
-  myclas->makeFileList("/home/matthew/Documents/Data/UK-Leps.images",5);
-  delete myclas;
-  return 0;
-  */
-
+  else if(((std::string)"makeFileList").compare(argv[1]) == 0){
+    myclas->makeFileList(img_folder,1);
+    myclas->makeFileList(img_folder,2);
+    myclas->makeFileList(img_folder,3);
+    myclas->makeFileList(img_folder,4);
+    myclas->makeFileList(img_folder,5);
+  }
 
   //checkFolders() TEST
-  /*
-  Classifier* myclas = new Classifier;
-  myclas->checkFolders("/home/matthew/Documents/Data/UK-Leps.images");
-  delete myclas;
-  return 0;
-  */
+  else if(((std::string)"checkFolders").compare(argv[1]) == 0){
+    myclas->checkFolders(img_folder);
+  }
   
   // Setting up SVM TEST
-  /*
-  Classifier* myclas = new Classifier;
-  myclas->trainSVM(vocab_file,seed_file,seed);
-  delete myclas;
-  return 0;
-  */
-
-
-  // Testing SVM results
-  ///*
-  Classifier* myclas = new Classifier;
-  myclas->testSVM(seed_file,vocab_file,svm_file,seed);
-  delete myclas;
-  return 0;
-  //*/
-
-  // Testing histogram
+  else if(((std::string)"trainSVM").compare(argv[1]) == 0){
+    myclas->trainSVM(vocab_file,seed_file,seed);
+  }
   
-  /*
-  cv::Mat src,res;
-  src = cv::imread(test_image);
-  Classifier* myclas = new Classifier;
-  Segmentor* myseg = new Segmentor;
-  myclas->getHist(src,res,myseg,true);
-  std::cout << "rows:" << res.rows << std::endl;
-  std::cout << "cols:" << res.cols << std::endl;
+  // Testing SVM results
+  else if(((std::string)"testSVM").compare(argv[1]) == 0){
+    myclas->testSVM(seed_file,vocab_file,svm_file,seed);
+  }
+  
+  // Run FULL TEST AND SAVE RESULTS
+  else if(((std::string)"trainSVM").compare(argv[1]) == 0){
+    
+    verbose = true;
+    std::string svm_1 = myclas->trainSVM(vocab_file,seed_file,1,verbose);
+    std::string svm_2 = myclas->trainSVM(vocab_file,sf2,2,verbose);
+    std::string svm_3 = myclas->trainSVM(vocab_file,sf3,3,verbose);
+    std::string svm_4 = myclas->trainSVM(vocab_file,sf4,4,verbose);
+    std::string svm_5 = myclas->trainSVM(vocab_file,sf5,5,verbose);
+
+    myclas->testSVM(seed_file,vocab_file,svm_file,seed,verbose);
+    myclas->testSVM(sf2,vocab_file,svm_file,2,verbose);
+    myclas->testSVM(sf3,vocab_file,svm_file,3,verbose);
+    myclas->testSVM(sf4,vocab_file,svm_file,4,verbose);
+    myclas->testSVM(sf5,vocab_file,svm_file,5,verbose);
+  }
+
   delete myclas;
-  delete myseg;
   return 0;
-  */
 }
