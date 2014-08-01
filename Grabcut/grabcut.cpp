@@ -195,6 +195,14 @@ int process_image(string filename, string binname )
 	  cv::Mat bin;
 	  getBinMask(mask,bin);
 	  imwrite(binname,bin);
+	  /*
+	  if(bin.at<unsigned char>(Point(1, 1)) == 0){
+	    cout << "0" << endl;
+	  }
+	  if(bin.at<unsigned char>(Point(200, 200)) == 1){
+	    cout << "1" << endl;
+	  }
+	  */
 	  cout << "Saving mask as: " << binname << endl;
 	  break;
 	}
@@ -216,6 +224,7 @@ int main( int argc, char** argv ){
     if(boost::filesystem::is_regular_file(*dir) && boost::filesystem::extension(*dir)== ".tif" ){
       string newfolder = save_path + dir->path().parent_path().filename().string();
       boost::filesystem::create_directory(newfolder);
+      
       string binname = newfolder +  "/" + dir->path().stem().string() + "-bin.jpg";
       process_image(dir->path().string(), binname);
     }
