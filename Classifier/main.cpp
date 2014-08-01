@@ -10,6 +10,7 @@ int main(int argc,  char** argv){
   
   std::string img_folder = "/home/matthew/Documents/Data/UK-Leps.images";
   std::string seed_file = "/home/matthew/Documents/classifier/Classifier/Seeds/test_seed_1";
+  std::string sf1 = "/home/matthew/Documents/classifier/Classifier/Seeds/test_seed_1";
   std::string sf2 = "/home/matthew/Documents/classifier/Classifier/Seeds/test_seed_2";
   std::string sf3 = "/home/matthew/Documents/classifier/Classifier/Seeds/test_seed_3";
   std::string sf4 = "/home/matthew/Documents/classifier/Classifier/Seeds/test_seed_4";
@@ -63,20 +64,23 @@ int main(int argc,  char** argv){
   }
   
   // Run FULL TEST AND SAVE RESULTS
-  else if(((std::string)"trainSVM").compare(argv[1]) == 0){
+  else if(((std::string)"FULL").compare(argv[1]) == 0){
     
     verbose = true;
-    std::string svm_1 = myclas->trainSVM(vocab_file,seed_file,1,verbose);
-    std::string svm_2 = myclas->trainSVM(vocab_file,sf2,2,verbose);
-    std::string svm_3 = myclas->trainSVM(vocab_file,sf3,3,verbose);
-    std::string svm_4 = myclas->trainSVM(vocab_file,sf4,4,verbose);
-    std::string svm_5 = myclas->trainSVM(vocab_file,sf5,5,verbose);
+    std::string svm_1 = myclas->trainSVM(vocab_file,sf1,1,verbose);
+    myclas->testSVM(sf1,vocab_file,svm_1,1,verbose);
 
-    myclas->testSVM(seed_file,vocab_file,svm_file,seed,verbose);
-    myclas->testSVM(sf2,vocab_file,svm_file,2,verbose);
-    myclas->testSVM(sf3,vocab_file,svm_file,3,verbose);
-    myclas->testSVM(sf4,vocab_file,svm_file,4,verbose);
-    myclas->testSVM(sf5,vocab_file,svm_file,5,verbose);
+    std::string svm_2 = myclas->trainSVM(vocab_file,sf2,2,verbose);
+    myclas->testSVM(sf2,vocab_file,svm_2,2,verbose);
+
+    std::string svm_3 = myclas->trainSVM(vocab_file,sf3,3,verbose);
+    myclas->testSVM(sf2,vocab_file,svm_3,3,verbose);
+
+    std::string svm_4 = myclas->trainSVM(vocab_file,sf4,4,verbose);
+    myclas->testSVM(sf2,vocab_file,svm_4,4,verbose);
+
+    std::string svm_5 = myclas->trainSVM(vocab_file,sf5,5,verbose);
+    myclas->testSVM(sf2,vocab_file,svm_5,5,verbose);
   }
 
   delete myclas;

@@ -482,6 +482,7 @@ void Classifier::testSVM(std::string seed_path, std::string vocab_path, std::str
       float minf = FLT_MAX; string minclass;
       for (map<string,unique_ptr<CvSVM>>::iterator it = classes_classifiers.begin(); it != classes_classifiers.end(); ++it) {
 	float res = (*it).second->predict(full_hist,true);
+	//cout << "res: " << res << endl;
 	if (res < minf) {
 	  minf = res;
 	  minclass = (*it).first;
@@ -663,12 +664,13 @@ std::string classify(std::string svm_path, std::string vocab_path, std::string i
   float minf = FLT_MAX; string minclass;
   for (map<string,unique_ptr<CvSVM>>::iterator it = classes_classifiers.begin(); it != classes_classifiers.end(); ++it){
     float res = (*it).second->predict(full_hist,true);
+    
     if (res < minf) {
       minf = res;
       minclass = (*it).first;
     }
   }
-
+ 
   delete myseg;
   delete myclas;
   return minclass;
