@@ -8,6 +8,8 @@
 const std::string winName = "Image";
 
 int main(){
+  //WHOLE MAIN FUNCTION JUST FOR TESTING, NOT TO BE RUN AS ./main
+
   /*
   Segmentor *mySeg = new Segmentor;
   cv::Mat res,image,crap;
