@@ -10,7 +10,7 @@ int main(){
   
   std::string seed_file = "/home/matthew/Documents/classifier/Classifier/Seeds/test_seed_1";
   std::string vocab_file = "/home/matthew/Documents/classifier/Classifier/Vocabularies/Vocabulary_1_2014-07-16.18:03:34.yml";
-  std::string svm_file =  "/home/matthew/Documents/classifier/Classifier/SVMS_12014-07-29.15:22:12";
+  std::string svm_file =  "/home/matthew/Documents/classifier/Classifier/SVMS_12014-08-01.12:33:55";
   std::string test_image = "/home/matthew/Documents/classifier/Classifier/image.tif";
   std::string test_image_2 = "/home/matthew/Desktop/1913939_253854910507_7156307_n.jpg";
   int seed = 1;

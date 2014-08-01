@@ -13,7 +13,7 @@ using namespace cv;
 const string winName = "Image";
 const Scalar RED = Scalar(0,0,255);
 const Scalar BLUE = Scalar(255,0,0);
-const int iter = 7;
+const int iter = 10;
 
 Segmentor::Segmentor(){}
 Segmentor::~Segmentor(){}
@@ -80,7 +80,8 @@ int Segmentor::segment(std::string filename, Mat& _res){
   // waitKey();
 
   // Perform grabcut on
-  rect = Rect(Point(10,10), Point(630,470));
+  int max_x = image.cols, max_y = image.rows;
+  rect = Rect(Point(max_x*(.05),max_y*(.05)), Point(max_x*(.95),max_y*(.95)));
   grabCut(image, mask,rect,bgdModel,fgdModel,iter,GC_INIT_WITH_RECT);
   
   changeImage(image, mask, _res);
@@ -100,7 +101,8 @@ void Segmentor::getMask(cv::Mat& image, cv::Mat& mask){
   // waitKey();
 
   // Perform grabcut on
-  rect = Rect(Point(10,10), Point(630,470));
+  int max_x = image.cols, max_y = image.rows;
+  rect = Rect(Point(max_x*(.05),max_y*(.05)), Point(max_x*(.95),max_y*(.95)));
   grabCut(image, comMask,rect,bgdModel,fgdModel,iter,GC_INIT_WITH_RECT);
   getBinMask(comMask,mask);
   //imshow(winName,mask);

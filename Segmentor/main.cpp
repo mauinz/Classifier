@@ -64,6 +64,7 @@ int main(){
   delete mySeg;
   return 0;
   */
+  /*
   Segmentor *mySeg = new Segmentor;
   cv::Mat img = cv::imread("../Grabcut/binmask.jpg",0), mask;
   imshow(winName,img);
@@ -72,6 +73,16 @@ int main(){
   imshow(winName,mask);
   cout << img.at<uchar>(0, 0) <<std::endl;
   cout << img.at<uchar>(200, 200) << std::endl;
-
+  
   cv::waitKey(0);
+  */
+
+  Segmentor *mySeg = new Segmentor;
+  cv::Mat res;
+  mySeg->segment("image.tif",res);
+  imshow(winName,res);
+  imwrite("10.jpg", res);
+  cv::waitKey(0);
+  
+  delete mySeg;
 }

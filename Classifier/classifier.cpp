@@ -27,7 +27,7 @@ Classifier::Classifier(){}
 Classifier::~Classifier(){}
 
 const int py_level = 3;
-const bool use_hist = false;
+const bool use_hist = true;
 const float hist_factor = 0.2;
 template <typename T>
 //=======================================================================================
@@ -411,7 +411,7 @@ void Classifier::extractTrainingData(std::string filepath, std::map<string,Mat>&
       }
       
       classes_training_data[seed[i][1]].push_back(full_hist);
-      
+      //cout << "hist: " << full_hist << endl;
     }
   }
   delete myseg;
@@ -474,6 +474,12 @@ void Classifier::testSVM(std::string seed_path, std::string vocab_path, std::str
       else{
 	bowide.compute(img, keypoints, full_hist);
       }
+
+      //Mat _descriptors;
+      //extractor->compute( img, keypoints, _descriptors );
+      //cout << "height: " << _descriptors.rows << endl;
+      //cout << "hist: height" << full_hist.size().height << endl;
+      //cout << "hist: cols" << full_hist.cols << endl;
       float minf = FLT_MAX; string minclass;
       for (map<string,unique_ptr<CvSVM>>::iterator it = classes_classifiers.begin(); it != classes_classifiers.end(); ++it) {
 	float res = (*it).second->predict(full_hist,true);
@@ -550,8 +556,13 @@ void Classifier::getHist(cv::Mat src, cv::Mat &res, Segmentor* myseg, bool verbo
   vconcat(tmp,r_hist,tmp);
 
   transpose(tmp,tmp);
-
-  normalize(tmp,res,0,hist_factor,NORM_MINMAX,-1,Mat());
+  CvScalar total = sum(tmp);
+  cout << total.val[0] << endl;
+  cout << total.val[1] << endl;
+  cout << total.val[2] << endl;
+  tmp /= total.val[0];
+  res = tmp;
+  //normalize(tmp,res,0,hist_factor,NORM_MINMAX,-1,Mat());
 
   // Verbose used for testing purposes
   if(verbose == true){
