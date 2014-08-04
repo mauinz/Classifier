@@ -1,11 +1,12 @@
 import os
 import classifier
+import wikipedia
 from flask import Flask, render_template, request, redirect, url_for, send_from_directory
 from werkzeug.utils import secure_filename
 
 UPLOAD_FOLDER = '/home/matthew/Documents/classifier/website/uploads'
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif', 'tif', 'tiff'])
-SVM_PATH = '/home/matthew/Documents/classifier/Classifier/SVMS_12014-07-24.14:30:30'
+SVM_PATH = '/home/matthew/Documents/classifier/Classifier/SVMS_12014-07-29.15:22:12'
 VOCAB_PATH = '/home/matthew/Documents/classifier/Classifier/Vocabularies/Vocabulary_1_2014-07-16.18:03:34.yml'
  
 
@@ -52,8 +53,14 @@ def butterflies():
             file.save(filepath)
             filename = 'http://146.169.45.105/uploads/' + filename
             res = classifier.classify(SVM_PATH,VOCAB_PATH, filepath)
+            page = wikipedia.page(res)
+            wiki = page.content
+            index = wiki.index('\n\n\n== See')
+            wiki = wiki[:index]
+            wiki = wiki.replace('\n\n\n==','<h2>')
+            wiki = wiki.replace('==\n','</h2>')
             #return redirect(url_for('uploaded_file',filename=filename))
-            return render_template('results.html',res=res,filename=filename)
+            return render_template('results.html',res=res,filename=filename,wiki=wiki)
     return render_template('butterflies.html')
 
 @app.route('/wasps')
