@@ -363,7 +363,7 @@ std::string Classifier::trainSVM(std::string vocab_path, std::string train_path,
     classifier.train(samples_32f,labels);
     
     stringstream ss;
-    ss << "SVMS_" << to_string(seed) << buf << "/SVM_classifier_";
+    ss << "SVMS_" << to_string(seed) << "_" << buf << "/SVM_classifier_";
     ss << buf << "+";
     ss << class_ << ".yml";
     if(verbose){
