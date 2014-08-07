@@ -36,7 +36,11 @@ int main(int argc,  char** argv){
   
   // getWords() TEST
   if(((std::string)"getWords").compare(argv[1]) == 0){
-    myclas->getWords(seed_file, seed, verbose);
+    myclas->getWords(sf1, 1, verbose);
+    myclas->getWords(sf2, 2, verbose);
+    myclas->getWords(sf3, 3, verbose);
+    myclas->getWords(sf4, 4, verbose);
+    myclas->getWords(sf5, 5, verbose);
   }
   
   // makeFileList() TEST

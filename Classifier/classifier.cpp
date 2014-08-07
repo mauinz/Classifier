@@ -613,6 +613,10 @@ void Classifier::getHist(cv::Mat src, cv::Mat &res, Segmentor* myseg, bool verbo
 //Function which is visible to the python wrapper 
 std::string classify(std::string svm_path, std::string vocab_path, std::string img_src)
 {
+  //TIMER============================================
+  std::clock_t    start;
+  start = std::clock();
+  //TIMER============================================
   cv::initModule_nonfree();
   Segmentor * myseg = new Segmentor;
   Classifier * myclas = new Classifier;
@@ -633,6 +637,7 @@ std::string classify(std::string svm_path, std::string vocab_path, std::string i
   bowide.setVocabulary(vocabulary);
   
   // Populate SVMs
+  //#pragma omp for
   for ( boost::filesystem::recursive_directory_iterator end, dir(svm_path); 
 	dir != end; ++dir ) {
     if(boost::filesystem::is_regular_file(*dir)){
@@ -662,6 +667,8 @@ std::string classify(std::string svm_path, std::string vocab_path, std::string i
     bowide.compute(img, keypoints, full_hist);
   }
   float minf = FLT_MAX; string minclass;
+  
+  //#pragma omp parallel for
   for (map<string,unique_ptr<CvSVM>>::iterator it = classes_classifiers.begin(); it != classes_classifiers.end(); ++it){
     float res = (*it).second->predict(full_hist,true);
     
@@ -673,6 +680,11 @@ std::string classify(std::string svm_path, std::string vocab_path, std::string i
  
   delete myseg;
   delete myclas;
+
+  
+  //TIMER============================================
+  std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+  //TIMER============================================
   return minclass;
 }
  
