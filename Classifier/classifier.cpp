@@ -659,7 +659,7 @@ std::string classify(std::string svm_path, std::string vocab_path, std::string i
       svm_count++;
     }
   }
-  //std::cout << "Preped file list and classes: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+  std::cout << "Preped file list and classes: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
   
 #pragma omp parallel for
   for(int i = 0; i < svm_count; i++){
@@ -673,12 +673,12 @@ std::string classify(std::string svm_path, std::string vocab_path, std::string i
   if(use_hist){
 
     detector->detect(img,keypoints);
-    //std::cout << "Detected Key Points: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+    std::cout << "Detected Key Points: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
     bowide.compute(img, keypoints, response_hist);
-    //std::cout << "BoW histogram found: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+    std::cout << "BoW histogram found: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
     //start = std::clock();
     myclas->getHist(img,colour_hist,myseg);
-    //std::cout << "Response histogram found: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+    std::cout << "Response histogram found: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
     colour_hist.convertTo(colour_hist,response_hist.type());
     hconcat(response_hist,colour_hist,full_hist);
   }
