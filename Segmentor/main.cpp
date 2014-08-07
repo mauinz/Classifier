@@ -80,11 +80,13 @@ int main(){
   */
 
   Segmentor *mySeg = new Segmentor;
-  cv::Mat res;
-  mySeg->segment("image.tif",res);
-  imshow(winName,res);
-  imwrite("10.jpg", res);
-  cv::waitKey(0);
+  cv::Mat img = cv::imread("image.tif"), res;
+  //mySeg->segment("image.tif",res);
+  
+  mySeg->getMask(img,res);
+  //imshow(winName,res);
+  //imwrite("10.jpg", res);
+  //cv::waitKey(0);
   
   delete mySeg;
 }

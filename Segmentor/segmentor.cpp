@@ -13,7 +13,7 @@ using namespace cv;
 const string winName = "Image";
 const Scalar RED = Scalar(0,0,255);
 const Scalar BLUE = Scalar(255,0,0);
-const int iter = 10;
+const int iter = 1;
 
 Segmentor::Segmentor(){}
 Segmentor::~Segmentor(){}
@@ -28,6 +28,17 @@ void Segmentor::getBinMask( const Mat& comMask, Mat& binMask ){
     binMask.create( comMask.size(), CV_8UC1 );
   }
   binMask = comMask & 1;
+}
+//=======================================================================================
+void changeMask( Mat& mask, vector<Point> bgdPixels, vector<Point> fgdPixels )
+//=======================================================================================
+{
+    vector<Point>::const_iterator it = bgdPixels.begin(), itEnd = bgdPixels.end();
+    for( ; it != itEnd; ++it )
+        mask.at<uchar>(*it) = GC_BGD;
+    it = fgdPixels.begin(), itEnd = fgdPixels.end();
+    for( ; it != itEnd; ++it )
+        mask.at<uchar>(*it) = GC_FGD;
 }
 //=======================================================================================
 void Segmentor::showImage( Mat& _img, Mat& _mask){
@@ -92,9 +103,9 @@ int Segmentor::segment(std::string filename, Mat& _res){
 //=======================================================================================
 void Segmentor::getMask(cv::Mat& image, cv::Mat& mask){
 //=======================================================================================
-  Mat comMask, bgdModel, fgdModel;
+  Mat comMask, bgdModel, fgdModel, res;
   Rect rect;
-  
+  vector<Point> fgdPxls, bgdPxls;
   
   // Show image to user and wait for click
   // imshow(winName, image);
@@ -102,10 +113,22 @@ void Segmentor::getMask(cv::Mat& image, cv::Mat& mask){
 
   // Perform grabcut on
   int max_x = image.cols, max_y = image.rows;
+  for(int i = 0; i < 32; i++){
+    for(int j = 0; j < 32; j++){
+      Point p1((int)(max_x*i/32),(int)(max_y*j/32));
+      bgdPxls.push_back(p1);
+    } 
+  }
+  
   rect = Rect(Point(max_x*(.05),max_y*(.05)), Point(max_x*(.95),max_y*(.95)));
-  grabCut(image, comMask,rect,bgdModel,fgdModel,iter,GC_INIT_WITH_RECT);
+  grabCut(image, comMask,rect,bgdModel,fgdModel,1,GC_INIT_WITH_RECT);
+  changeMask( comMask, bgdPxls, fgdPxls );
+  grabCut(image, comMask, rect, bgdModel, fgdModel, 2, GC_INIT_WITH_MASK );
   getBinMask(comMask,mask);
-  //imshow(winName,mask);
+  //changeImage(image, mask, res);
+  //imshow(winName,res);
+  //imwrite("dots.jpg",res);
+  //waitKey(0);
   //std::cout <<"GC_BGD:"<< GC_BGD << std::endl;
   //changeImage(image, mask, _res);
   //waitKey();
