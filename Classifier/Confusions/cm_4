@@ -1,4 +1,4 @@
-Total Accuracy: 96.9697%
+Total Accuracy: 98.4848%
 ------------------Confusion Matix------------------
 Aglais-urticae -> Aglais-urticae:1
 Anthocharis-cardamines-FEMALE -> Anthocharis-cardamines-FEMALE:1
@@ -44,8 +44,8 @@ Neozephyrus-quercus-FEMALE -> Neozephyrus-quercus-FEMALE:1
 Neozephyrus-quercus-MALE -> Neozephyrus-quercus-MALE:1
 Ochlodes-faunus -> Ochlodes-faunus:1
 Papilio-machaon -> Papilio-machaon:1
-Pieris-brassicae-FEMALE:1
 Pararge-aegeria -> Pararge-aegeria:1
+Pieris-brassicae-FEMALE -> Pieris-brassicae-FEMALE:1
 Pieris-brassicae-MALE -> Pieris-brassicae-MALE:1
 Pieris-napi-FEMALE -> Pieris-napi-FEMALE:1
 Pieris-napi-MALE -> Pieris-napi-MALE:1

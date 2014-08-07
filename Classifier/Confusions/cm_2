@@ -2,11 +2,11 @@ Total Accuracy: 78.7879%
 ------------------Confusion Matix------------------
 Aglais-urticae -> Aglais-urticae:1
 Apatura-iris -> Apatura-iris:1
+Pararge-aegeria:1
 Aphantopus-hyperantus -> Aphantopus-hyperantus:1
 Argynnis-adippe -> Argynnis-adippe:1
 Argynnis-aglaja -> Argynnis-aglaja:1
 Argynnis-paphia -> Argynnis-paphia:1
-Thymelicus-acteon-FEMALE:1
 Aricia-agestis -> Aricia-agestis:1
 Aricia-artaxerxes -> Aricia-artaxerxes:1
 Lysandra-coridon-FEMALE:1
@@ -17,6 +17,7 @@ Carterocephalus-palaemon -> Carterocephalus-palaemon:1
 Celastrina-argiolus -> Celastrina-argiolus:1
 Coenonympha-pamphilus -> Coenonympha-pamphilus:1
 Coenonympha-tullia -> Coenonympha-tullia:1
+Thymelicus-acteon-FEMALE:1
 Colias-croceus -> Anthocharis-cardamines-MALE:1
 Colias-croceus:1
 Hesperia-comma:1
@@ -28,7 +29,6 @@ Erynnis-tages -> Erynnis-tages:1
 Euphydryas-aurinia -> Euphydryas-aurinia:1
 Gonepteryx-rhamni -> Gonepteryx-rhamni:1
 Hipparchia-seleme -> Hipparchia-seleme:1
-Pararge-aegeria:1
 Inachis-io -> Inachis-io:1
 Lasiommata-megera -> Lasiommata-megera:1
 Leptidea-sinapis -> Leptidea-sinapis:1

@@ -76,19 +76,19 @@ int main(int argc,  char** argv){
   else if(((std::string)"FULL").compare(argv[1]) == 0){
     
     verbose = true;
-    std::string svm_1 = myclas->trainSVM(vocab_file,sf1,1,verbose);
+    std::string svm_1 = myclas->trainSVM(vf1,sf1,1,verbose);
     myclas->testSVM(sf1,vf1,svm_1,1,verbose);
 
-    std::string svm_2 = myclas->trainSVM(vocab_file,sf2,2,verbose);
+    std::string svm_2 = myclas->trainSVM(vf2,sf2,2,verbose);
     myclas->testSVM(sf2,vf2,svm_2,2,verbose);
 
-    std::string svm_3 = myclas->trainSVM(vocab_file,sf3,3,verbose);
+    std::string svm_3 = myclas->trainSVM(vf3,sf3,3,verbose);
     myclas->testSVM(sf2,vf3,svm_3,3,verbose);
 
-    std::string svm_4 = myclas->trainSVM(vocab_file,sf4,4,verbose);
+    std::string svm_4 = myclas->trainSVM(vf4,sf4,4,verbose);
     myclas->testSVM(sf2,vf4,svm_4,4,verbose);
 
-    std::string svm_5 = myclas->trainSVM(vocab_file,sf5,5,verbose);
+    std::string svm_5 = myclas->trainSVM(vf5,sf5,5,verbose);
     myclas->testSVM(sf2,vf5,svm_5,5,verbose);
   }
 
