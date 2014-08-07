@@ -620,8 +620,11 @@ std::string classify(std::string svm_path, std::string vocab_path, std::string i
   cv::initModule_nonfree();
   Segmentor * myseg = new Segmentor;
   Classifier * myclas = new Classifier;
+  
+  //map<string,unique_ptr<CvSVM>> classes_classifiers;//CvSVM tmp_SVM;
 
-  map<string,unique_ptr<CvSVM>> classes_classifiers;//CvSVM tmp_SVM;
+  vector<string> classes, svm_paths;
+  vector<CvSVM*> classifiers;
 
   Ptr<FeatureDetector> detector =  makePtr<PyramidAdaptedFeatureDetector>(FeatureDetector::create("SIFT"),py_level); //detector
   Ptr<DescriptorExtractor > extractor = DescriptorExtractor::create("OpponentSIFT"); // Extractor
@@ -638,6 +641,7 @@ std::string classify(std::string svm_path, std::string vocab_path, std::string i
   
   // Populate SVMs
   //#pragma omp for
+  int svm_count = 0;
   for ( boost::filesystem::recursive_directory_iterator end, dir(svm_path); 
 	dir != end; ++dir ) {
     if(boost::filesystem::is_regular_file(*dir)){
@@ -645,20 +649,36 @@ std::string classify(std::string svm_path, std::string vocab_path, std::string i
       boost::split(tmp_line,dir->path().string(), boost::is_any_of("+"));
       
       std::string class_name = tmp_line[1].substr(0, tmp_line[1].size()-4);
-
-      classes_classifiers.insert(make_pair(class_name, unique_ptr<CvSVM>(new CvSVM())));
-      classes_classifiers[class_name]->load((dir->path().string()).c_str());
       
+      //classes_classifiers.insert(make_pair(class_name, unique_ptr<CvSVM>(new CvSVM())));
+      //classes_classifiers[class_name]->load((dir->path().string()).c_str());
+      
+      classes.push_back(class_name);
+      classifiers.push_back(new CvSVM());
+      svm_paths.push_back(dir->path().string());
+      svm_count++;
     }
   }
+  //std::cout << "Preped file list and classes: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+  
+#pragma omp parallel for
+  for(int i = 0; i < svm_count; i++){
+    //std::cout << "int i:  " << i << endl;
+    classifiers[i]->load(svm_paths[i].c_str());
+  }
 
-
+  std::cout << "Loaded SVMS: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
   Mat img = imread(img_src), response_hist, colour_hist,full_hist;      
   vector<KeyPoint> keypoints;
   if(use_hist){
+
     detector->detect(img,keypoints);
+    //std::cout << "Detected Key Points: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
     bowide.compute(img, keypoints, response_hist);
+    //std::cout << "BoW histogram found: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+    //start = std::clock();
     myclas->getHist(img,colour_hist,myseg);
+    //std::cout << "Response histogram found: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
     colour_hist.convertTo(colour_hist,response_hist.type());
     hconcat(response_hist,colour_hist,full_hist);
   }
@@ -669,6 +689,7 @@ std::string classify(std::string svm_path, std::string vocab_path, std::string i
   float minf = FLT_MAX; string minclass;
   
   //#pragma omp parallel for
+  /*
   for (map<string,unique_ptr<CvSVM>>::iterator it = classes_classifiers.begin(); it != classes_classifiers.end(); ++it){
     float res = (*it).second->predict(full_hist,true);
     
@@ -677,13 +698,40 @@ std::string classify(std::string svm_path, std::string vocab_path, std::string i
       minclass = (*it).first;
     }
   }
- 
+  */
+
+  int pos;
+  float private_minf;
+  float res;
+  int private_pos;
+#pragma omp parallel private(private_minf,private_pos,res)
+  {
+    private_minf = FLT_MAX;
+#pragma omp for
+    for ( int i = 0; i < svm_count; i++) {
+      res = classifiers[i]->predict(full_hist,true);
+      //std::cout << "int i:  " << i << endl;
+      if (res < private_minf ){
+	private_minf = res;
+	private_pos = i;
+      }
+    }
+    if ( private_minf < minf ) {
+#pragma omp critical
+      {
+	if ( private_minf < minf ){
+	  minf = private_minf;
+	  pos = private_pos;
+	}
+      }
+    }
+  }
   delete myseg;
   delete myclas;
-
-  
+  minclass = classes[pos];
+  std::cout << "Identified: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
   //TIMER============================================
-  std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+  //std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
   //TIMER============================================
   return minclass;
 }
