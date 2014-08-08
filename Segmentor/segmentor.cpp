@@ -107,6 +107,9 @@ void Segmentor::getMask(cv::Mat& image, cv::Mat& mask){
   Rect rect;
   vector<Point> fgdPxls, bgdPxls;
   
+  const int dx[8] = {-1, -1, 0, 1, 1,  1,  0, -1};
+  const int dy[8] = { 0,  1, 1, 1, 0, -1, -1, -1};
+
   // Show image to user and wait for click
   // imshow(winName, image);
   // waitKey();
@@ -124,10 +127,26 @@ void Segmentor::getMask(cv::Mat& image, cv::Mat& mask){
   grabCut(image, comMask,rect,bgdModel,fgdModel,1,GC_INIT_WITH_RECT);
   changeMask( comMask, bgdPxls, fgdPxls );
   grabCut(image, comMask, rect, bgdModel, fgdModel, 2, GC_INIT_WITH_MASK );
+  int x,y;
+  for(int i = 1; i < 31; i++){
+    for(int j = 1; j < 31; j++){
+      for(int k = 0; k < 8; k++){
+	x = (int)(max_x*i/32) + dx[k];
+	y = (int)(max_y*j/32) + dy[k];
+	if(mask.at<uchar>(x,y) == 1){
+	  break;
+	}
+	else if(k == 7){
+	  mask.at<uchar>(x,y) = 0;
+	}
+      }		   
+    } 
+  }
+
   getBinMask(comMask,mask);
-  //changeImage(image, mask, res);
-  //imshow(winName,res);
-  //imwrite("dots.jpg",res);
+  changeImage(image, mask, res);
+  imshow(winName,res);
+  imwrite("final.jpg",res);
   //waitKey(0);
   //std::cout <<"GC_BGD:"<< GC_BGD << std::endl;
   //changeImage(image, mask, _res);
