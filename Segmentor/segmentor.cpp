@@ -127,27 +127,30 @@ void Segmentor::getMask(cv::Mat& image, cv::Mat& mask){
   grabCut(image, comMask,rect,bgdModel,fgdModel,1,GC_INIT_WITH_RECT);
   changeMask( comMask, bgdPxls, fgdPxls );
   grabCut(image, comMask, rect, bgdModel, fgdModel, 2, GC_INIT_WITH_MASK );
+  
+  vector<Point>::const_iterator it = bgdPxls.begin(), itEnd = bgdPxls.end();
   int x,y;
-  for(int i = 1; i < 31; i++){
-    for(int j = 1; j < 31; j++){
-      for(int k = 0; k < 8; k++){
-	x = (int)(max_x*i/32) + dx[k];
-	y = (int)(max_y*j/32) + dy[k];
-	if(mask.at<uchar>(x,y) == 1){
-	  break;
-	}
-	else if(k == 7){
-	  mask.at<uchar>(x,y) = 0;
-	}
-      }		   
-    } 
+  for( ; it != itEnd; ++it ){
+    for(int k = 0; k < 8; k++){
+      x = it->x + dx[k];
+      y = it->y + dy[k];
+      if(x > 0 && x <max_x && y > 0 && y <max_y && 
+	 (comMask.at<uchar>(y,x) == GC_BGD || 
+	  comMask.at<uchar>(y,x) == GC_PR_BGD)){
+	break;
+      }
+      else if(k == 7){
+	comMask.at<uchar>(*it) = GC_FGD;
+      }
+    }
   }
 
   getBinMask(comMask,mask);
   changeImage(image, mask, res);
   imshow(winName,res);
   imwrite("final.jpg",res);
-  //waitKey(0);
+  waitKey(0);
+  
   //std::cout <<"GC_BGD:"<< GC_BGD << std::endl;
   //changeImage(image, mask, _res);
   //waitKey();
