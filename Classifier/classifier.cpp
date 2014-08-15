@@ -418,6 +418,123 @@ void Classifier::extractTrainingData(std::string filepath, std::map<string,Mat>&
   }
   delete myseg;
 }
+
+// vocab_path = Path of vocabulary file
+// train_path = Path of seed file
+//=======================================================================================
+std::string Classifier::trainSVMParams(std::string vocab_path, std::string train_path, int seed, bool verbose){
+//=======================================================================================
+  cv::initModule_nonfree();
+  if(verbose){
+    cout << "Training SVM Parameters" << endl;
+    cout << "reading vocabulary from file: "<< vocab_path <<endl;
+  }
+  Mat vocabulary;
+  FileStorage fs(vocab_path, FileStorage::READ);
+  fs["vocabulary"] >> vocabulary;
+  fs.release();	
+  
+  Ptr<FeatureDetector> detector =  makePtr<PyramidAdaptedFeatureDetector>(FeatureDetector::create("SIFT"),py_level); //detector
+  Ptr<DescriptorExtractor > extractor = DescriptorExtractor::create("OpponentSIFT"); // Extractor
+  Ptr<DescriptorMatcher > matcher(new BFMatcher);
+  BOWImgDescriptorExtractor bowide(extractor,matcher);
+  bowide.setVocabulary(vocabulary);
+  
+  // Reading in response histograms
+  map<string,Mat> classes_training_data; classes_training_data.clear();
+  vector<std::string> class_names;
+  if(verbose){
+    cout << "Reading reponse histograms from training data" << endl;
+  }
+  extractTrainingData(train_path,  classes_training_data, vocabulary);
+  
+  if(verbose){  
+    cout << "Training with " << classes_training_data.size() << " classes." <<endl;
+  }
+  for (map<string,Mat>::iterator it = classes_training_data.begin(); it != classes_training_data.end(); ++it) {
+    if(verbose){
+      cout << " class " << (*it).first << " has " << (*it).second.rows << " samples"<<endl;
+    }
+    class_names.push_back((*it).first);
+  }
+  
+  //DATA LOADED AND READY TO TRAIN ==================================================
+  if(verbose){
+    std::cout << "Training Support Vector Machine" << std::endl;
+  }
+  time_t     now = time(0);
+  struct tm  tstruct;
+  char       buf[80];
+  tstruct = *localtime(&now);
+  strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &tstruct);
+  stringstream folder_name, param_name;
+  folder_name << "SVMS_" << to_string(seed) << "_" << buf;
+  param_name << "Params_" << to_string(seed) << "_" << buf;
+  boost::filesystem::create_directories(folder_name.str());
+  boost::filesystem::create_directories(param_name.str());
+  for (unsigned int i=0;i<class_names.size();i++) {
+    string class_ = class_names[i];
+    
+    cv::Mat samples(0,(*classes_training_data.begin()).second.cols,(*classes_training_data.begin()).second.type());
+    cv::Mat labels(0,1,CV_32FC1);
+    CvSVMParams parameters;
+    CvParamGrid CvParamGrid_C(pow(2.0,-5), pow(2.0,15), pow(2.0,1));
+    CvParamGrid CvParamGrid_gamma(pow(2.0,-15), pow(2.0,3), pow(2.0,1));
+
+
+    //copy class samples and label
+    if(verbose){
+      cout << "adding " << classes_training_data[class_].rows << " positive" << endl;
+    }
+    samples.push_back(classes_training_data[class_]);
+    Mat class_label = Mat::ones(classes_training_data[class_].rows, 1, CV_32FC1);
+    labels.push_back(class_label);
+
+    //copy rest of samples and label
+    for (map<string,Mat>::iterator it1 = classes_training_data.begin(); it1 != classes_training_data.end(); ++it1) {
+      string not_class_ = (*it1).first;
+      if(not_class_.compare(class_)==0) continue;
+      samples.push_back(classes_training_data[not_class_]);
+      class_label = Mat::zeros(classes_training_data[not_class_].rows, 1, CV_32FC1);
+      labels.push_back(class_label);
+    }
+    if(verbose){
+      cout << "Train.." << endl;
+    }
+    cv::Mat samples_32f; samples.convertTo(samples_32f, CV_32F);
+    if(samples.rows == 0) continue; //phantom class?!
+    CvSVM classifier;
+    if(classes_training_data[class_].rows > 1){
+      classifier.train_auto(samples_32f,labels, cv::Mat(), cv::Mat(), parameters, 10,CvParamGrid_C, CvParamGrid_gamma, CvSVM::get_default_grid(CvSVM::P), CvSVM::get_default_grid(CvSVM::NU), CvSVM::get_default_grid(CvSVM::COEF), CvSVM::get_default_grid(CvSVM::DEGREE), true);
+    }
+    else{
+      classifier.train(samples_32f,labels);
+    }
+    stringstream ss;
+    std::string ps;
+    ofstream par_file;
+    ss << "SVMS_" << to_string(seed) << "_" << buf << "/SVM_classifier_";
+    ss << buf << "+";
+    ss << class_ << ".yml";
+    ps =  "Params_" + to_string(seed) + "_" + buf + "/Params_classifier_";
+    ps = ps + buf + "+";
+    ps = ps + class_ + ".txt";
+    if(verbose){
+      cout << "Saving as: " << ss.str() << endl;
+    }
+    classifier.save(ss.str().c_str());
+    par_file.open(ps.c_str());
+    parameters = classifier.get_params();
+    par_file << "C: " << parameters.C << endl;
+    par_file << "GAMMA: " << parameters.gamma << endl;
+    par_file << "P: " << parameters.p << endl;
+    par_file << "NU: " << parameters.nu << endl;
+    par_file << "COEF: " << parameters.coef0 << endl;
+    par_file << "DEGREE: " << parameters.degree << endl;
+    par_file.close();
+  }
+  return folder_name.str();
+}
 // seed_path  = Path to seed file
 // vocav_path = Path to vocabulary file
 // svm_path   = Path to SVM files
@@ -530,6 +647,8 @@ void Classifier::testSVM(std::string seed_path, std::string vocab_path, std::str
 
   delete myseg;
 }
+
+
 
 //=======================================================================================
 void Classifier::getHist(cv::Mat src, cv::Mat &res, Segmentor* myseg, bool verbose){

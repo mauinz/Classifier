@@ -1,0 +1,6 @@
+C: 8
+GAMMA: 4
+P: 0
+NU: 0
+COEF: 0
+DEGREE: 0

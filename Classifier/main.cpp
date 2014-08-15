@@ -66,6 +66,11 @@ int main(int argc,  char** argv){
   else if(((std::string)"trainSVM").compare(argv[1]) == 0){
     myclas->trainSVM(vocab_file,seed_file,seed);
   }
+
+  else if(((std::string)"trainParams").compare(argv[1]) == 0){
+    std::string svm = myclas->trainSVMParams(vf1,sf1,1,verbose);
+    myclas->testSVM(sf1,vf1,svm,1,verbose);
+  }
   
   // Testing SVM results
   else if(((std::string)"testSVM").compare(argv[1]) == 0){
@@ -73,24 +78,26 @@ int main(int argc,  char** argv){
   }
   
   // Run FULL TEST AND SAVE RESULTS
-  else if(((std::string)"FULL").compare(argv[1]) == 0){
-    
+  else if(((std::string)"FULLParams").compare(argv[1]) == 0){
+
     verbose = true;
-    std::string svm_1 = myclas->trainSVM(vf1,sf1,1,verbose);
+    std::string svm_1 = myclas->trainSVMParams(vf1,sf1,1,verbose);
     myclas->testSVM(sf1,vf1,svm_1,1,verbose);
 
-    std::string svm_2 = myclas->trainSVM(vf2,sf2,2,verbose);
+    std::string svm_2 = myclas->trainSVMParams(vf2,sf2,2,verbose);
     myclas->testSVM(sf2,vf2,svm_2,2,verbose);
 
-    std::string svm_3 = myclas->trainSVM(vf3,sf3,3,verbose);
+    std::string svm_3 = myclas->trainSVMParams(vf3,sf3,3,verbose);
     myclas->testSVM(sf2,vf3,svm_3,3,verbose);
 
-    std::string svm_4 = myclas->trainSVM(vf4,sf4,4,verbose);
+    std::string svm_4 = myclas->trainSVMParams(vf4,sf4,4,verbose);
     myclas->testSVM(sf2,vf4,svm_4,4,verbose);
 
-    std::string svm_5 = myclas->trainSVM(vf5,sf5,5,verbose);
+    std::string svm_5 = myclas->trainSVMParams(vf5,sf5,5,verbose);
     myclas->testSVM(sf2,vf5,svm_5,5,verbose);
   }
+
+    
 
   delete myclas;
   return 0;

@@ -1,0 +1,6 @@
+C: 2048
+GAMMA: 0.5
+P: 0
+NU: 0
+COEF: 0
+DEGREE: 0
