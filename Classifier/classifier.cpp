@@ -23,8 +23,6 @@
 using namespace std;
 using namespace cv;
 
-Classifier::Classifier(){}
-Classifier::~Classifier(){}
 
 const int histSize = 30;
 const int h_bins = 25;
@@ -35,6 +33,22 @@ const bool use_hist = true;
 const bool use_hsv = true;
 //const float hist_factor = 0.2;
 
+Classifier::Classifier(){
+  cv::initModule_nonfree();
+  cv::initModule_features2d();
+  
+  detector =  makePtr<PyramidAdaptedFeatureDetector>(FeatureDetector::create("SIFT"),py_level); //det]ector
+  extractor = DescriptorExtractor::create("OpponentSIFT"); // Extractor  
+  Ptr<DescriptorMatcher > matcher(new BFMatcher);
+  myseg = new Segmentor;
+}
+
+Classifier::~Classifier(){
+  delete detector;
+  delete extractor;
+  delete matcher;
+  delete myseg;
+}
 template <typename T>
 //=======================================================================================
 std::string to_string(T value){
@@ -111,9 +125,6 @@ int Classifier::getWords(std::string folderpath, int seed, bool verbose){
   cv::initModule_nonfree();
   cv::initModule_features2d();
   
-  Ptr<FeatureDetector> detector =  makePtr<PyramidAdaptedFeatureDetector>(FeatureDetector::create("SIFT"),py_level); //detector
-  Ptr<DescriptorExtractor > extractor = DescriptorExtractor::create("OpponentSIFT"); // Extractor
-  //Ptr<DescriptorMatcher > matcher(new BFMatcher); // Brute Force matcher
   std::vector<cv::KeyPoint> keypoints;
   cv::Mat training_descriptors(0,extractor->descriptorSize(),extractor->descriptorType());
   cv::Mat descriptors;
@@ -166,11 +177,12 @@ int Classifier::getWords(std::string folderpath, int seed, bool verbose){
 	if(verbose){
 	  std::cout << "Reading: " << seed_data[i][0] << std::endl;
 	}
-	Mat img = imread(seed_data[i][0]);
+	Mat img = imread(seed_data[i][0]), mask;
 	if(verbose){
 	  std::cout << "Detecting" << std::endl;
 	}
-	detector->detect(img, keypoints);
+	myseg->getMask(img, mask);
+	detector->detect(img, keypoints,mask);
 	if(verbose){
 	  std::cout << "Extracting" << std::endl;
 	}
@@ -179,26 +191,13 @@ int Classifier::getWords(std::string folderpath, int seed, bool verbose){
       }
     }
   }
-
-  if(verbose){
-    std::cout << "Total descriptors: " << training_descriptors.rows << std::endl
-	      << "Saving Descriptors" << std::endl;
-  }
-  // Save descriptors
-  std::string save_des = "Descriptors/Descriptors_";
+  
   time_t     now = time(0);
   struct tm  tstruct;
   char       buf[80];
   tstruct = *localtime(&now);
   strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &tstruct);
-  save_des += buf;
-  save_des += ".yml";
-  // Currently not saving descriptors as file is a bit large
-  //std::cout << "Saving descriptors as: " << save_des << std::endl;
-  //FileStorage fs1(save_des, FileStorage::WRITE);
-  //fs1 << "training_descriptors" << training_descriptors;
-  //fs1.release();
-
+  
   // Find vocabulary
   cv::BOWKMeansTrainer bowtrainer(1000); //num clusters
   bowtrainer.add(training_descriptors);
@@ -272,17 +271,9 @@ int Classifier::makeFileList(std::string folderpath, int seed){
     }
   }
 
-  // print2Dvector(image_split);
-  
   // Save to csv
   save2Dvector(image_split,seed);
 
-  // load2Dvector() TEST
-  /*
-  vector<vector<std::string> > test;
-  load2Dvector(test, "test_seed_1");
-  print2Dvector(test);
-  */
   return 0;
   
 }
@@ -292,18 +283,17 @@ int Classifier::makeFileList(std::string folderpath, int seed){
 std::string Classifier::trainSVM(std::string vocab_path, std::string train_path, int seed, bool verbose){
 //=======================================================================================
   cv::initModule_nonfree();
+
   if(verbose){
     cout << "Training SVM" << endl;
     cout << "reading vocabulary from file: "<< vocab_path <<endl;
   }
+
   Mat vocabulary;
   FileStorage fs(vocab_path, FileStorage::READ);
   fs["vocabulary"] >> vocabulary;
   fs.release();	
   
-  Ptr<FeatureDetector> detector =  makePtr<PyramidAdaptedFeatureDetector>(FeatureDetector::create("SIFT"),py_level); //detector
-  Ptr<DescriptorExtractor > extractor = DescriptorExtractor::create("OpponentSIFT"); // Extractor
-  Ptr<DescriptorMatcher > matcher(new BFMatcher);
   BOWImgDescriptorExtractor bowide(extractor,matcher);
   bowide.setVocabulary(vocabulary);
   
@@ -383,19 +373,18 @@ std::string Classifier::trainSVM(std::string vocab_path, std::string train_path,
 void Classifier::extractTrainingData(std::string filepath, std::map<string,Mat>& classes_training_data, cv::Mat vocabulary,bool verbose ){
 //=======================================================================================
   cv::initModule_nonfree();
-  Segmentor * myseg = new Segmentor;
+  
+  
   if(verbose){
     cout << "Extracting Training Data" << endl;
     cout << "Reading seed information from file: "<< filepath <<endl;
   }
   vector<KeyPoint> keypoints;
   cv::Mat response_hist, colour_hist,full_hist;
-  cv::Mat img;
+  cv::Mat img, mask;
   std::vector<std::vector<string> > seed;
   load2Dvector(seed,filepath);
-  Ptr<FeatureDetector> detector =  makePtr<PyramidAdaptedFeatureDetector>(FeatureDetector::create("SIFT"),py_level); //detector
-  Ptr<DescriptorExtractor > extractor = DescriptorExtractor::create("OpponentSIFT"); // Extractor
-  Ptr<DescriptorMatcher > matcher(new BFMatcher);
+  
   BOWImgDescriptorExtractor bowide(extractor,matcher);
   bowide.setVocabulary(vocabulary);
   std::cout << "Descriptor size: " << bowide.descriptorSize() << std::endl; 
@@ -403,10 +392,11 @@ void Classifier::extractTrainingData(std::string filepath, std::map<string,Mat>&
   for(unsigned int i = 0; i < seed.size(); i++){
     if(seed[i][2] == "train"){
       img = imread(seed[i][0]);
-      detector->detect(img,keypoints);
+      myseg->getMask(img, mask);
+      detector->detect(img,keypoints,mask);
       if(use_hist){
 	bowide.compute(img, keypoints, response_hist);
-	getHist(img,colour_hist,myseg);
+	getHist(img,colour_hist,mask);
 	colour_hist.convertTo(colour_hist,response_hist.type());
 	hconcat(response_hist,colour_hist,full_hist);
       }
@@ -418,10 +408,9 @@ void Classifier::extractTrainingData(std::string filepath, std::map<string,Mat>&
       }
       
       classes_training_data[seed[i][1]].push_back(full_hist);
-      //cout << "hist: " << full_hist << endl;
     }
   }
-  delete myseg;
+
 }
 
 // vocab_path = Path of vocabulary file
@@ -439,9 +428,6 @@ std::string Classifier::trainSVMParams(std::string vocab_path, std::string train
   fs["vocabulary"] >> vocabulary;
   fs.release();	
   
-  Ptr<FeatureDetector> detector =  makePtr<PyramidAdaptedFeatureDetector>(FeatureDetector::create("SIFT"),py_level); //detector
-  Ptr<DescriptorExtractor > extractor = DescriptorExtractor::create("OpponentSIFT"); // Extractor
-  Ptr<DescriptorMatcher > matcher(new BFMatcher);
   BOWImgDescriptorExtractor bowide(extractor,matcher);
   bowide.setVocabulary(vocabulary);
   
@@ -472,11 +458,11 @@ std::string Classifier::trainSVMParams(std::string vocab_path, std::string train
   char       buf[80];
   tstruct = *localtime(&now);
   strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &tstruct);
-  stringstream folder_name, param_name;
+  stringstream folder_name;
   folder_name << "SVMS_" << to_string(seed) << "_" << buf;
-  param_name << "Params_" << to_string(seed) << "_" << buf;
+
   boost::filesystem::create_directories(folder_name.str());
-  boost::filesystem::create_directories(param_name.str());
+
   for (unsigned int i=0;i<class_names.size();i++) {
     string class_ = class_names[i];
     
@@ -516,27 +502,13 @@ std::string Classifier::trainSVMParams(std::string vocab_path, std::string train
       classifier.train(samples_32f,labels);
     }
     stringstream ss;
-    std::string ps;
-    ofstream par_file;
     ss << "SVMS_" << to_string(seed) << "_" << buf << "/SVM_classifier_";
     ss << buf << "+";
     ss << class_ << ".yml";
-    ps =  "Params_" + to_string(seed) + "_" + buf + "/Params_classifier_";
-    ps = ps + buf + "+";
-    ps = ps + class_ + ".txt";
     if(verbose){
       cout << "Saving as: " << ss.str() << endl;
     }
     classifier.save(ss.str().c_str());
-    par_file.open(ps.c_str());
-    parameters = classifier.get_params();
-    par_file << "C: " << parameters.C << endl;
-    par_file << "GAMMA: " << parameters.gamma << endl;
-    par_file << "P: " << parameters.p << endl;
-    par_file << "NU: " << parameters.nu << endl;
-    par_file << "COEF: " << parameters.coef0 << endl;
-    par_file << "DEGREE: " << parameters.degree << endl;
-    par_file.close();
   }
   return folder_name.str();
 }
@@ -555,9 +527,7 @@ void Classifier::testSVM(std::string seed_path, std::string vocab_path, std::str
   vector<string> classes; //load up with the respective classes
   std::vector<std::vector<string> > test_images;
   load2Dvector(test_images, seed_path);
-  Ptr<FeatureDetector> detector =  makePtr<PyramidAdaptedFeatureDetector>(FeatureDetector::create("SIFT"),py_level); //detector
-  Ptr<DescriptorExtractor > extractor = DescriptorExtractor::create("OpponentSIFT"); // Extractor
-  Ptr<DescriptorMatcher > matcher(new BFMatcher);
+
   BOWImgDescriptorExtractor bowide(extractor,matcher);
 
   cout << "Reading vocabulary from file: "<< vocab_path <<endl;
@@ -588,16 +558,18 @@ void Classifier::testSVM(std::string seed_path, std::string vocab_path, std::str
 
   for(unsigned int i = 0; i < test_images.size(); i++) {
     if(test_images[i][2] == "test"){
-      Mat img = imread(test_images[i][0]), response_hist, colour_hist,full_hist;      
+      Mat img = imread(test_images[i][0]), mask,response_hist, colour_hist,full_hist;
+      myseg->getMask(img, mask);
       vector<KeyPoint> keypoints;
-      detector->detect(img,keypoints);
+      detector->detect(img,keypoints,mask);
       if(use_hist){
 	bowide.compute(img, keypoints, response_hist);
-	getHist(img,colour_hist,myseg);
+	getHist(img,colour_hist,mask);
 	colour_hist.convertTo(colour_hist,response_hist.type());
 	hconcat(response_hist,colour_hist,full_hist);
       }
       else{
+	myseg->getMask(img, mask);
 	bowide.compute(img, keypoints, full_hist);
       }
 
@@ -656,13 +628,13 @@ void Classifier::testSVM(std::string seed_path, std::string vocab_path, std::str
 
 
 //=======================================================================================
-void Classifier::getHist(cv::Mat src, cv::Mat &res, Segmentor* myseg, bool verbose){
+void Classifier::getHist(cv::Mat src, cv::Mat &res, cv::Mat mask, bool verbose){
 //=======================================================================================
-  Mat dst, tmp, mask;
+  Mat dst, tmp;
   res.release();
   // Get mask from segmentor
 
-  myseg->getMask(src, mask);
+  
 
   /// Separate the image in 3 places ( B, G and R )
   vector<Mat> bgr_planes, hsv_planes;
@@ -816,16 +788,17 @@ std::string classify(std::string svm_path, std::string vocab_path, std::string i
   }
 
   std::cout << "Loaded SVMS: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
-  Mat img = imread(img_src), response_hist, colour_hist,full_hist;      
+  Mat img = imread(img_src), mask, response_hist, colour_hist,full_hist;      
   vector<KeyPoint> keypoints;
+  myseg->getMask(img, mask);
   if(use_hist){
 
-    detector->detect(img,keypoints);
+    detector->detect(img,keypoints,mask);
     std::cout << "Detected Key Points: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
     bowide.compute(img, keypoints, response_hist);
     std::cout << "BoW histogram found: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
     //start = std::clock();
-    myclas->getHist(img,colour_hist,myseg);
+    myclas->getHist(img,colour_hist,mask);
     std::cout << "Response histogram found: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
     colour_hist.convertTo(colour_hist,response_hist.type());
     hconcat(response_hist,colour_hist,full_hist);
