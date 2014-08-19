@@ -26,8 +26,13 @@ using namespace cv;
 Classifier::Classifier(){}
 Classifier::~Classifier(){}
 
+const int histSize = 30;
+const int h_bins = 25;
+const int s_bins = 30;
 const int py_level = 4;
+const bool use_hist_py = false;
 const bool use_hist = true;
+const bool use_hsv = true;
 //const float hist_factor = 0.2;
 
 template <typename T>
@@ -660,12 +665,9 @@ void Classifier::getHist(cv::Mat src, cv::Mat &res, Segmentor* myseg, bool verbo
   myseg->getMask(src, mask);
 
   /// Separate the image in 3 places ( B, G and R )
-  vector<Mat> bgr_planes;
+  vector<Mat> bgr_planes, hsv_planes;
   split( src, bgr_planes );
   
-  /// Establish the number of bins
-  int histSize = 30;
-
   /// Set the ranges ( for B,G,R) )
   float range[] = { 0, 256 } ;
   const float* histRange = { range };
@@ -673,22 +675,49 @@ void Classifier::getHist(cv::Mat src, cv::Mat &res, Segmentor* myseg, bool verbo
   bool uniform = true; bool accumulate = false;
 
   Mat b_hist, g_hist, r_hist;
+  Mat hsv_image, h_hist, s_hist;
 
-  /// Compute the histograms:
-  calcHist( &bgr_planes[0], 1, 0, mask, b_hist, 1, &histSize, &histRange, uniform, accumulate );
-  calcHist( &bgr_planes[1], 1, 0, mask, g_hist, 1, &histSize, &histRange, uniform, accumulate );
-  calcHist( &bgr_planes[2], 1, 0, mask, r_hist, 1, &histSize, &histRange, uniform, accumulate );
+  if(use_hsv){
   
-  // Concatenate the histograms
-  vconcat(b_hist,g_hist,tmp);
-  vconcat(tmp,r_hist,tmp);
+    cvtColor( src, hsv_image, COLOR_BGR2HSV );
+    split( hsv_image, hsv_planes );
+   
+    // hue varies from 0 to 179, saturation from 0 to 255
+    float h_ranges[] = { 0, 180 };
+    float s_ranges[] = { 0, 256 };
+    
+    const float* hRange = { h_ranges};
+    const float* sRange = { s_ranges};
 
-  transpose(tmp,tmp);
-  CvScalar total = sum(tmp);
-  tmp /= total.val[0];
-  res = tmp;
-  //normalize(tmp,res,0,hist_factor,NORM_MINMAX,-1,Mat());
+    // Use the o-th and 1-st channels
+    calcHist( &hsv_planes[0], 1, 0, mask, h_hist, 1, &h_bins, &hRange, uniform, accumulate );
+    calcHist( &hsv_planes[1], 1, 0, mask, s_hist, 1, &s_bins, &sRange, uniform, accumulate );
 
+    vconcat(h_hist,s_hist,tmp);
+    
+    transpose(tmp,tmp);
+    CvScalar total = sum(tmp);
+    tmp /= total.val[0];
+    res = tmp;
+  }
+  else{
+    
+  
+    /// Compute the histograms:
+    calcHist( &bgr_planes[0], 1, 0, mask, b_hist, 1, &histSize, &histRange, uniform, accumulate );
+    calcHist( &bgr_planes[1], 1, 0, mask, g_hist, 1, &histSize, &histRange, uniform, accumulate );
+    calcHist( &bgr_planes[2], 1, 0, mask, r_hist, 1, &histSize, &histRange, uniform, accumulate );
+  
+    // Concatenate the histograms
+    vconcat(b_hist,g_hist,tmp);
+    vconcat(tmp,r_hist,tmp);
+
+    transpose(tmp,tmp);
+    CvScalar total = sum(tmp);
+    tmp /= total.val[0];
+    res = tmp;
+    //normalize(tmp,res,0,hist_factor,NORM_MINMAX,-1,Mat());
+  }
   // Verbose used for testing purposes
   if(verbose == true){
     // Draw the histograms for B, G and R
