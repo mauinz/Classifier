@@ -1,6 +1,0 @@
-C: 8192
-GAMMA: 0.125
-P: 0
-NU: 0
-COEF: 0
-DEGREE: 0

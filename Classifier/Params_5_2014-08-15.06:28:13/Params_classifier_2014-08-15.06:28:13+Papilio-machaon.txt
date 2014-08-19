@@ -1,6 +1,0 @@
-C: 4096
-GAMMA: 0.03125
-P: 0
-NU: 0
-COEF: 0
-DEGREE: 0

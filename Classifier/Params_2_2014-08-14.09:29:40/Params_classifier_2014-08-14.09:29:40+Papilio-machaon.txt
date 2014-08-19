@@ -1,6 +1,0 @@
-C: 32
-GAMMA: 2
-P: 0
-NU: 0
-COEF: 0
-DEGREE: 0
