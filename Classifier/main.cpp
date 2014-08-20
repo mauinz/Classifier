@@ -16,11 +16,16 @@ int main(int argc,  char** argv){
   std::string sf4 = "/home/matthew/Documents/classifier/Classifier/Seeds/test_seed_4";
   std::string sf5 = "/home/matthew/Documents/classifier/Classifier/Seeds/test_seed_5";
   std::string vocab_file = "/home/matthew/Documents/classifier/Classifier/Vocabularies/Vocabulary_1_2014-07-16.18:03:34.yml";
-  std::string vf1 = "/home/matthew/Documents/classifier/Classifier/Vocabularies/Vocabulary_1_2014-08-05.21:34:18.yml";
-  std::string vf2 = "/home/matthew/Documents/classifier/Classifier/Vocabularies/Vocabulary_2_2014-08-05.22:33:08.yml";
-  std::string vf3 = "/home/matthew/Documents/classifier/Classifier/Vocabularies/Vocabulary_3_2014-08-05.23:32:26.yml";
-  std::string vf4 = "/home/matthew/Documents/classifier/Classifier/Vocabularies/Vocabulary_4_2014-08-06.00:33:06.yml";
-  std::string vf5 = "/home/matthew/Documents/classifier/Classifier/Vocabularies/Vocabulary_5_2014-08-06.01:32:53.yml";
+  std::string svm_1 = "/home/matthew/Documents/classifier/Classifier/SVMS_1_2014-08-20.00:34:18";
+  std::string svm_2 = "/home/matthew/Documents/classifier/Classifier/SVMS_2_2014-08-20.02:20:15";
+  std::string svm_3 = "/home/matthew/Documents/classifier/Classifier/SVMS_3_2014-08-20.04:05:58";
+  std::string svm_4 = "/home/matthew/Documents/classifier/Classifier/SVMS_4_2014-08-20.05:51:52";
+  std::string svm_5 = "/home/matthew/Documents/classifier/Classifier/SVMS_5_2014-08-20.07:38:21";
+  std::string vf1 = "/home/matthew/Documents/classifier/Classifier/Vocabularies/Vocabulary_1_2014-08-19.18:28:23.yml";
+  std::string vf2 = "/home/matthew/Documents/classifier/Classifier/Vocabularies/Vocabulary_2_2014-08-19.19:35:40.yml";
+  std::string vf3 = "/home/matthew/Documents/classifier/Classifier/Vocabularies/Vocabulary_3_2014-08-19.20:42:59.yml";
+  std::string vf4 = "/home/matthew/Documents/classifier/Classifier/Vocabularies/Vocabulary_4_2014-08-19.21:50:30.yml";
+  std::string vf5 = "/home/matthew/Documents/classifier/Classifier/Vocabularies/Vocabulary_5_2014-08-19.22:58:06.yml";
   std::string svm_file =  "/home/matthew/Documents/classifier/Classifier/SVMS_12014-08-01.12:33:55";
   std::string test_image = "/home/matthew/Documents/classifier/Classifier/image.tif";
   std::string test_image_2 = "/home/matthew/Desktop/1913939_253854910507_7156307_n.jpg";
@@ -74,7 +79,11 @@ int main(int argc,  char** argv){
   
   // Testing SVM results
   else if(((std::string)"testSVM").compare(argv[1]) == 0){
-    myclas->testSVM(seed_file,vocab_file,svm_file,seed);
+    myclas->testSVM(sf1,vf1,svm_1,1);
+    myclas->testSVM(sf2,vf2,svm_2,2);
+    myclas->testSVM(sf3,vf3,svm_3,3);
+    myclas->testSVM(sf4,vf4,svm_4,4);
+    myclas->testSVM(sf5,vf5,svm_5,5);
   }
   
   // Run FULL TEST AND SAVE RESULTS
@@ -88,13 +97,13 @@ int main(int argc,  char** argv){
     myclas->testSVM(sf2,vf2,svm_2,2,verbose);
 
     std::string svm_3 = myclas->trainSVMParams(vf3,sf3,3,verbose);
-    myclas->testSVM(sf2,vf3,svm_3,3,verbose);
+    myclas->testSVM(sf3,vf3,svm_3,3,verbose);
 
     std::string svm_4 = myclas->trainSVMParams(vf4,sf4,4,verbose);
-    myclas->testSVM(sf2,vf4,svm_4,4,verbose);
+    myclas->testSVM(sf4,vf4,svm_4,4,verbose);
 
     std::string svm_5 = myclas->trainSVMParams(vf5,sf5,5,verbose);
-    myclas->testSVM(sf2,vf5,svm_5,5,verbose);
+    myclas->testSVM(sf5,vf5,svm_5,5,verbose);
   }
 
     

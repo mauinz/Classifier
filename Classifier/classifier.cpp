@@ -39,7 +39,7 @@ Classifier::Classifier(){
   
   detector =  makePtr<PyramidAdaptedFeatureDetector>(FeatureDetector::create("SIFT"),py_level); //det]ector
   extractor = DescriptorExtractor::create("OpponentSIFT"); // Extractor  
-  Ptr<DescriptorMatcher > matcher(new BFMatcher);
+  matcher = DescriptorMatcher::create("BruteForce");
   myseg = new Segmentor;
 }
 
@@ -430,7 +430,7 @@ std::string Classifier::trainSVMParams(std::string vocab_path, std::string train
   
   BOWImgDescriptorExtractor bowide(extractor,matcher);
   bowide.setVocabulary(vocabulary);
-  
+  cout << "working" << endl;
   // Reading in response histograms
   map<string,Mat> classes_training_data; classes_training_data.clear();
   vector<std::string> class_names;
