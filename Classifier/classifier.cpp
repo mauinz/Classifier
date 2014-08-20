@@ -27,8 +27,10 @@ using namespace cv;
 const int histSize = 30;
 const int h_bins = 25;
 const int s_bins = 30;
+const int hist_level = 2;
 const int py_level = 4;
 const bool use_hist_py = false;
+const bool use_hist_pyramid = true;
 const bool use_hist = true;
 const bool use_hsv = true;
 //const float hist_factor = 0.2;
@@ -381,7 +383,7 @@ void Classifier::extractTrainingData(std::string filepath, std::map<string,Mat>&
   }
   vector<KeyPoint> keypoints;
   cv::Mat response_hist, colour_hist,full_hist;
-  cv::Mat img, mask;
+  cv::Mat img, mask, tmp;
   std::vector<std::vector<string> > seed;
   load2Dvector(seed,filepath);
   
@@ -391,17 +393,29 @@ void Classifier::extractTrainingData(std::string filepath, std::map<string,Mat>&
 
   for(unsigned int i = 0; i < seed.size(); i++){
     if(seed[i][2] == "train"){
+      double hu[7];
       img = imread(seed[i][0]);
       myseg->getMask(img, mask);
+      getmoments(mask,hu);
+      cv::Mat mom = (Mat_<double>(1,7) << hu[0], hu[1], hu[2], hu[3], hu[4], hu[5], hu[6]); 
       detector->detect(img,keypoints,mask);
       if(use_hist){
 	bowide.compute(img, keypoints, response_hist);
-	getHist(img,colour_hist,mask);
-	colour_hist.convertTo(colour_hist,response_hist.type());
-	hconcat(response_hist,colour_hist,full_hist);
+	if(use_hist_pyramid){
+	  getHistPyramid(img,colour_hist,mask);
+	}
+	else{
+	  getHist(img,colour_hist,mask);
+	}
+	colour_hist.convertTo(colour_hist,response_hist.type());	
+	mom.convertTo(mom,response_hist.type());
+	hconcat(response_hist,colour_hist,tmp);
+	hconcat(tmp,mom, full_hist);
       }
       else{
-	bowide.compute(img, keypoints, full_hist);
+	bowide.compute(img, keypoints, response_hist);
+	mom.convertTo(mom,response_hist.type());
+	hconcat(response_hist,mom,full_hist);
       }
       if(classes_training_data.count(seed[i][1]) == 0) { //not yet created...
 	classes_training_data[seed[i][1]].create(0,(full_hist.cols),full_hist.type());
@@ -558,19 +572,30 @@ void Classifier::testSVM(std::string seed_path, std::string vocab_path, std::str
 
   for(unsigned int i = 0; i < test_images.size(); i++) {
     if(test_images[i][2] == "test"){
-      Mat img = imread(test_images[i][0]), mask,response_hist, colour_hist,full_hist;
+      Mat img = imread(test_images[i][0]), mask,response_hist, colour_hist,full_hist, tmp;
       myseg->getMask(img, mask);
       vector<KeyPoint> keypoints;
+      double hu[7];
+      getmoments(mask,hu);
+      cv::Mat mom = (Mat_<double>(1,7) << hu[0], hu[1], hu[2], hu[3], hu[4], hu[5], hu[6]); 
       detector->detect(img,keypoints,mask);
       if(use_hist){
 	bowide.compute(img, keypoints, response_hist);
-	getHist(img,colour_hist,mask);
+	if(use_hist_pyramid){
+          getHistPyramid(img,colour_hist,mask);
+        }
+        else{
+          getHist(img,colour_hist,mask);
+        }
 	colour_hist.convertTo(colour_hist,response_hist.type());
-	hconcat(response_hist,colour_hist,full_hist);
+	mom.convertTo(mom,response_hist.type());
+	hconcat(response_hist,colour_hist,tmp);
+	hconcat(tmp,mom, full_hist);
       }
       else{
-	myseg->getMask(img, mask);
-	bowide.compute(img, keypoints, full_hist);
+	bowide.compute(img, keypoints, response_hist);
+	mom.convertTo(mom,response_hist.type());
+	hconcat(response_hist,mom,full_hist);
       }
 
       float minf = FLT_MAX; string minclass;
@@ -729,6 +754,36 @@ void Classifier::getHist(cv::Mat src, cv::Mat &res, cv::Mat mask, bool verbose){
 
 
 }
+void Classifier::getHistPyramid(cv::Mat src, cv::Mat &res, cv::Mat mask, bool verbose){
+  cv::Mat full;
+  int step_y = src.rows/hist_level, step_x = src.cols/hist_level;
+
+  for(int i = 0; i < hist_level; i++){
+    for(int j = 0; j < hist_level; j++){
+      cv::Mat tmp, rect_mask;
+      rect_mask = cv::Mat::zeros(src.size(),CV_8UC1);
+      rect_mask(Rect(i*step_x,j*step_y,step_x, step_y)) = 1;
+      bitwise_and(rect_mask,mask,rect_mask);
+      
+      if(i == 0 && j == 0){   
+	getHist(src,full,rect_mask);
+      }
+      else{
+	getHist(src,tmp,rect_mask);
+	hconcat(full,tmp,full);
+      }
+    }
+  }
+  CvScalar total = sum(full);
+  full /= total.val[0];
+  res = full;
+}
+
+void Classifier::getmoments(cv::Mat binmask, double hu[7]){
+  vector<float> res;
+  cv::Moments mom = cv::moments(binmask,true);
+  cv::HuMoments(mom, hu);
+}
 
 //Function which is visible to the python wrapper 
 std::string classify(std::string svm_path, std::string vocab_path, std::string img_src)
@@ -794,12 +849,17 @@ std::string classify(std::string svm_path, std::string vocab_path, std::string i
   if(use_hist){
 
     detector->detect(img,keypoints,mask);
-    std::cout << "Detected Key Points: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+    //std::cout << "Detected Key Points: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
     bowide.compute(img, keypoints, response_hist);
-    std::cout << "BoW histogram found: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+    //std::cout << "BoW histogram found: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
     //start = std::clock();
-    myclas->getHist(img,colour_hist,mask);
-    std::cout << "Response histogram found: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+    if(use_hist_pyramid){
+      myclas->getHistPyramid(img,colour_hist,mask);
+    }
+    else{
+      myclas->getHist(img,colour_hist,mask);
+    }
+    //std::cout << "Response histogram found: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
     colour_hist.convertTo(colour_hist,response_hist.type());
     hconcat(response_hist,colour_hist,full_hist);
   }
@@ -808,19 +868,7 @@ std::string classify(std::string svm_path, std::string vocab_path, std::string i
     bowide.compute(img, keypoints, full_hist);
   }
   float minf = FLT_MAX; string minclass;
-  
-  //#pragma omp parallel for
-  /*
-  for (map<string,unique_ptr<CvSVM>>::iterator it = classes_classifiers.begin(); it != classes_classifiers.end(); ++it){
-    float res = (*it).second->predict(full_hist,true);
-    
-    if (res < minf) {
-      minf = res;
-      minclass = (*it).first;
-    }
-  }
-  */
-
+ 
   int pos;
   float private_minf;
   float res;
