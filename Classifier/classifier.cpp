@@ -25,8 +25,8 @@ using namespace cv;
 
 
 const int histSize = 30;
-const int h_bins = 25;
-const int s_bins = 30;
+const int h_bins = 50;
+const int s_bins = 60;
 const int hist_level = 2;
 const int py_level = 4;
 const bool use_hist_py = false;
@@ -698,7 +698,6 @@ void Classifier::getHist(cv::Mat src, cv::Mat &res, cv::Mat mask, bool verbose){
     res = tmp;
   }
   else{
-    
   
     /// Compute the histograms:
     calcHist( &bgr_planes[0], 1, 0, mask, b_hist, 1, &histSize, &histRange, uniform, accumulate );
@@ -719,36 +718,37 @@ void Classifier::getHist(cv::Mat src, cv::Mat &res, cv::Mat mask, bool verbose){
   if(verbose == true){
     // Draw the histograms for B, G and R
     int hist_w = 512; int hist_h = 400;
-    int bin_w = cvRound( (double) hist_w/histSize );
+    int s_bin_w = cvRound( (double) hist_w/s_bins );
+    int h_bin_w = cvRound( (double) hist_w/h_bins );
     
     Mat histImage( hist_h, hist_w, CV_8UC3, Scalar( 0,0,0) );
     
     /// Normalize the result to [ 0, histImage.rows ]
     
-    normalize(b_hist, b_hist, 0, histImage.rows, NORM_MINMAX, -1, Mat() );
-    normalize(g_hist, g_hist, 0, histImage.rows, NORM_MINMAX, -1, Mat() );
-    normalize(r_hist, r_hist, 0, histImage.rows, NORM_MINMAX, -1, Mat() );
+    normalize(h_hist, h_hist, 0, histImage.rows, NORM_MINMAX, -1, Mat() );
+    normalize(s_hist, s_hist, 0, histImage.rows, NORM_MINMAX, -1, Mat() );
     
   
     /// Draw for each channel
     
-    for( int i = 1; i < histSize; i++ )
+    for( int i = 1; i < h_bins; i++ )
       {
-	line( histImage, Point( bin_w*(i-1), hist_h - cvRound(b_hist.at<float>(i-1)) ) ,
-	      Point( bin_w*(i), hist_h - cvRound(b_hist.at<float>(i)) ),
+	line( histImage, Point( h_bin_w*(i-1), hist_h - cvRound(h_hist.at<float>(i-1)) ) ,
+	      Point( h_bin_w*(i), hist_h - cvRound(h_hist.at<float>(i)) ),
 	      Scalar( 255, 0, 0), 2, 8, 0  );
-	line( histImage, Point( bin_w*(i-1), hist_h - cvRound(g_hist.at<float>(i-1)) ) ,
-	      Point( bin_w*(i), hist_h - cvRound(g_hist.at<float>(i)) ),
-	    Scalar( 0, 255, 0), 2, 8, 0  );
-	line( histImage, Point( bin_w*(i-1), hist_h - cvRound(r_hist.at<float>(i-1)) ) ,
-	      Point( bin_w*(i), hist_h - cvRound(r_hist.at<float>(i)) ),
-	      Scalar( 0, 0, 255), 2, 8, 0  );
+      }
+    
+    for( int i = 1; i < s_bins; i++ )
+      {
+	line( histImage, Point( s_bin_w*(i-1), hist_h - cvRound(s_hist.at<float>(i-1)) ) ,
+	      Point( s_bin_w*(i), hist_h - cvRound(s_hist.at<float>(i)) ),
+	      Scalar( 0, 255, 0), 2, 8, 0  );
       }
     
     /// Display
     namedWindow("calcHist Demo", CV_WINDOW_AUTOSIZE );
     imshow("calcHist Demo", histImage );
-    
+    //imwrite("Euphydryas-aurinia-hist.jpeg",histImage);
     waitKey(0);
   }
 
@@ -766,10 +766,10 @@ void Classifier::getHistPyramid(cv::Mat src, cv::Mat &res, cv::Mat mask, bool ve
       bitwise_and(rect_mask,mask,rect_mask);
       
       if(i == 0 && j == 0){   
-	getHist(src,full,rect_mask);
+	getHist(src,full,rect_mask,verbose);
       }
       else{
-	getHist(src,tmp,rect_mask);
+	getHist(src,tmp,rect_mask,verbose);
 	hconcat(full,tmp,full);
       }
     }

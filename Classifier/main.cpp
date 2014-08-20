@@ -105,9 +105,27 @@ int main(int argc,  char** argv){
     std::string svm_5 = myclas->trainSVMParams(vf5,sf5,5,verbose);
     myclas->testSVM(sf5,vf5,svm_5,5,verbose);
   }
-
+  
+  else if(((std::string)"hist").compare(argv[1]) == 0){
+    Segmentor *myseg = new Segmentor;
     
+    //Mat img1 = imread("/home/matthew/Documents/Data/UK-Leps.images/Euphydryas-aurinia/Euphydryas-aurinia-01.tif",1), mask1, res1;
+    Mat img1 = imread("/home/matthew/Documents/Data/UK-Leps.images/Coenonympha-pamphilus/Coenonympha-pamphilus-01.tif",1), mask1, res1;
 
+    myseg->getMask(img1,mask1);
+    imshow("name",mask1);
+    waitKey(0);
+    myclas->getHistPyramid(img1, res1, mask1, true);
+    /*
+    Mat img2 = imread("/home/matthew/Documents/Data/UK-Leps.images/Coenonympha-pamphilus/Coenonympha-pamphilus-01.tif",1), mask2, res2;
+
+    myseg->getMask(img2,mask2);
+    myclas->getHist(img2, res2, mask2, true);
+    delete myseg;
+    */
+  }
+  
+    
   delete myclas;
   return 0;
 }
