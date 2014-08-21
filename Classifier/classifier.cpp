@@ -33,6 +33,7 @@ const bool use_hist_py = false;
 const bool use_hist_pyramid = true;
 const bool use_hist = true;
 const bool use_hsv = true;
+const bool use_flips = true;
 //const float hist_factor = 0.2;
 
 Classifier::Classifier(){
@@ -382,46 +383,30 @@ void Classifier::extractTrainingData(std::string filepath, std::map<string,Mat>&
     cout << "Reading seed information from file: "<< filepath <<endl;
   }
   vector<KeyPoint> keypoints;
-  cv::Mat response_hist, colour_hist,full_hist;
-  cv::Mat img, mask, tmp;
+  cv::Mat full_hist,full_hist_flip;
+  cv::Mat img, mask,img_flip,mask_flip;
   std::vector<std::vector<string> > seed;
   load2Dvector(seed,filepath);
   
   BOWImgDescriptorExtractor bowide(extractor,matcher);
   bowide.setVocabulary(vocabulary);
   std::cout << "Descriptor size: " << bowide.descriptorSize() << std::endl; 
-
+  
   for(unsigned int i = 0; i < seed.size(); i++){
     if(seed[i][2] == "train"){
-      double hu[7];
       img = imread(seed[i][0]);
       myseg->getMask(img, mask);
-      getmoments(mask,hu);
-      cv::Mat mom = (Mat_<double>(1,7) << hu[0], hu[1], hu[2], hu[3], hu[4], hu[5], hu[6]); 
-      detector->detect(img,keypoints,mask);
-      if(use_hist){
-	bowide.compute(img, keypoints, response_hist);
-	if(use_hist_pyramid){
-	  getHistPyramid(img,colour_hist,mask);
-	}
-	else{
-	  getHist(img,colour_hist,mask);
-	}
-	colour_hist.convertTo(colour_hist,response_hist.type());	
-	mom.convertTo(mom,response_hist.type());
-	hconcat(response_hist,colour_hist,tmp);
-	hconcat(tmp,mom, full_hist);
-      }
-      else{
-	bowide.compute(img, keypoints, response_hist);
-	mom.convertTo(mom,response_hist.type());
-	hconcat(response_hist,mom,full_hist);
-      }
+      getFeatures(img,mask,full_hist,&bowide);
       if(classes_training_data.count(seed[i][1]) == 0) { //not yet created...
 	classes_training_data[seed[i][1]].create(0,(full_hist.cols),full_hist.type());
       }
-      
       classes_training_data[seed[i][1]].push_back(full_hist);
+      if(use_flips){
+	flip(img,img_flip,1);
+	flip(mask,mask_flip,1);
+	getFeatures(img_flip,mask_flip,full_hist_flip,&bowide);
+	classes_training_data[seed[i][1]].push_back(full_hist_flip);
+      }
     }
   }
 
@@ -777,6 +762,34 @@ void Classifier::getHistPyramid(cv::Mat src, cv::Mat &res, cv::Mat mask, bool ve
   CvScalar total = sum(full);
   full /= total.val[0];
   res = full;
+}
+
+void Classifier::getFeatures(cv::Mat img,cv::Mat mask, cv::Mat &res, BOWImgDescriptorExtractor * bowide){
+  double hu[7];
+  getmoments(mask,hu);
+  vector<KeyPoint> keypoints;
+  cv::Mat mom = (Mat_<double>(1,7) << hu[0], hu[1], hu[2], hu[3], hu[4], hu[5], hu[6]);
+  cv::Mat response_hist,colour_hist,tmp,full_hist;
+  detector->detect(img,keypoints,mask);
+  if(use_hist){
+    bowide->compute(img, keypoints, response_hist);
+    if(use_hist_pyramid){
+      getHistPyramid(img,colour_hist,mask);
+    }
+    else{
+      getHist(img,colour_hist,mask);
+    }
+    colour_hist.convertTo(colour_hist,response_hist.type());	
+    mom.convertTo(mom,response_hist.type());
+    hconcat(response_hist,colour_hist,tmp);
+    hconcat(tmp,mom, full_hist);
+  }
+  else{
+    bowide->compute(img, keypoints, response_hist);
+    mom.convertTo(mom,response_hist.type());
+    hconcat(response_hist,mom,full_hist);
+  }
+  res=full_hist;
 }
 
 void Classifier::getmoments(cv::Mat binmask, double hu[7]){

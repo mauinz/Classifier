@@ -47,6 +47,8 @@ public:
   // Destructor
   ~Classifier();
   // Main functionality of the class
+  
+  void getFeatures(cv::Mat img,cv::Mat mask, cv::Mat &res, BOWImgDescriptorExtractor * bowide);
   int getWords(std::string folderpath,int seed, bool verbose = false);
   int makeFileList(std::string folderpath, int seed);
   void checkFolders(std::string folderpath);
