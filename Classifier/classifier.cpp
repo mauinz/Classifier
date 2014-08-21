@@ -25,8 +25,8 @@ using namespace cv;
 
 
 const int histSize = 30;
-const int h_bins = 50;
-const int s_bins = 60;
+const int h_bins = 25;
+const int s_bins = 30;
 const int hist_level = 2;
 const int py_level = 4;
 const bool use_hist_py = false;

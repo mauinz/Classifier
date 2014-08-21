@@ -1,12 +1,11 @@
-Total Accuracy: 84.8485%
+Total Accuracy: 87.8788%
 ------------------Confusion Matix------------------
 Aglais-urticae -> Aglais-urticae:1
 Anthocharis-cardamines-FEMALE -> Anthocharis-cardamines-FEMALE:1
 Anthocharis-cardamines-MALE:1
 Apatura-iris -> Apatura-iris:1
-Aphantopus-hyperantus -> Aphantopus-hyperantus:1
-Argynnis-aglaja -> Argynnis-adippe:1
-Argynnis-aglaja:1
+Argynnis-adippe -> Argynnis-adippe:1
+Argynnis-aglaja -> Argynnis-aglaja:1
 Boloria-selene:1
 Argynnis-paphia -> Argynnis-paphia:1
 Aricia-agestis -> Aricia-agestis:1
@@ -40,7 +39,8 @@ Lysandra-bellargus-FEMALE -> Lysandra-bellargus-FEMALE:1
 Lysandra-bellargus-MALE -> Lysandra-bellargus-MALE:1
 Lysandra-coridon-FEMALE -> Lysandra-coridon-FEMALE:1
 Lysandra-coridon-MALE -> Lysandra-coridon-MALE:1
-Maniola-jurtina -> Maniola-jurtina:1
+Maniola-jurtina -> Aphantopus-hyperantus:1
+Maniola-jurtina:1
 Melanargia-galathea -> Melanargia-galathea:1
 Melitaea-athalia -> Melitaea-athalia:1
 Melitaea-cinxia -> Melitaea-cinxia:1
@@ -52,15 +52,15 @@ Pararge-aegeria -> Pararge-aegeria:1
 Pieris-brassicae-MALE -> Pieris-brassicae-FEMALE:1
 Pieris-brassicae-MALE:1
 Pieris-napi-FEMALE -> Pieris-napi-FEMALE:1
-Pieris-rapae-FEMALE -> Pieris-napi-MALE:1
-Pieris-rapae-FEMALE:1
+Pieris-napi-MALE -> Pieris-napi-MALE:1
+Pieris-rapae-FEMALE -> Pieris-rapae-FEMALE:1
 Plebeius-argus-MALE -> Plebeius-argus-MALE:1
 Polygonia-c-album -> Polygonia-c-album:1
 Polyommatus-icarus -> Polyommatus-icarus:1
 Pyrgus-malvae -> Pyrgus-malvae:1
 Pyronia-tithonus -> Pyronia-tithonus:1
 Satyrium-pruni -> Satyrium-pruni:1
-Satyrium-w-album:1
+Satyrium-w-album -> Satyrium-w-album:1
 Thecla-betulae -> Thecla-betulae:1
 Thymelicus-lineola -> Thymelicus-lineola:1
 Thymelicus-sylvestris -> Thymelicus-sylvestris:1

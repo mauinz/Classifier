@@ -1,0 +1,68 @@
+Total Accuracy: 84.8485%
+------------------Confusion Matix------------------
+Aglais-urticae -> Aglais-urticae:1
+Anthocharis-cardamines-FEMALE -> Anthocharis-cardamines-FEMALE:1
+Anthocharis-cardamines-MALE:1
+Apatura-iris -> Apatura-iris:1
+Aphantopus-hyperantus -> Aphantopus-hyperantus:1
+Argynnis-adippe -> Argynnis-adippe:1
+Argynnis-aglaja -> Argynnis-aglaja:1
+Argynnis-paphia -> Argynnis-paphia:1
+Aricia-agestis -> Aricia-agestis:1
+Aricia-artaxerxes -> Aricia-artaxerxes:1
+Boloria-euphrosyne -> Boloria-euphrosyne:1
+Boloria-selene -> Boloria-selene:1
+Callophrys-rubi -> Callophrys-rubi:1
+Carterocephalus-palaemon -> Carterocephalus-palaemon:1
+Celastrina-argiolus -> Celastrina-argiolus:1
+Coenonympha-pamphilus -> Coenonympha-pamphilus:1
+Coenonympha-tullia -> Coenonympha-tullia:1
+Plebeius-argus-FEMALE:1
+Colias-croceus -> Colias-croceus:1
+Cupido-minimus -> Cupido-minimus:1
+Erebia-aethiops -> Erebia-aethiops:1
+Erebia-epiphron -> Erebia-epiphron:1
+Erynnis-tages -> Erynnis-tages:1
+Euphydryas-aurinia -> Euphydryas-aurinia:1
+Hamearis-lucina:1
+Gonepteryx-rhamni -> Gonepteryx-rhamni:1
+Hesperia-comma -> Hesperia-comma:1
+Thymelicus-acteon-MALE:1
+Hipparchia-seleme -> Hipparchia-seleme:1
+Inachis-io -> Inachis-io:1
+Lasiommata-megera -> Lasiommata-megera:1
+Leptidea-sinapis -> Leptidea-sinapis:1
+Pieris-brassicae-MALE:1
+Limenitis-camilla -> Limenitis-camilla:1
+Lycaena-phlaeas -> Lycaena-phlaeas:1
+Lysandra-bellargus-FEMALE -> Lysandra-bellargus-FEMALE:1
+Lysandra-bellargus-MALE -> Lysandra-bellargus-MALE:1
+Lysandra-coridon-FEMALE -> Lysandra-coridon-FEMALE:1
+Lysandra-coridon-MALE -> Lysandra-coridon-MALE:1
+Maniola-jurtina -> Maniola-jurtina:1
+Melanargia-galathea -> Melanargia-galathea:1
+Melitaea-athalia -> Melitaea-athalia:1
+Melitaea-cinxia -> Melitaea-cinxia:1
+Neozephyrus-quercus-FEMALE -> Neozephyrus-quercus-FEMALE:1
+Neozephyrus-quercus-MALE -> Neozephyrus-quercus-MALE:1
+Ochlodes-faunus -> Ochlodes-faunus:1
+Thymelicus-sylvestris:1
+Papilio-machaon -> Papilio-machaon:1
+Pararge-aegeria -> Pararge-aegeria:1
+Pieris-brassicae-FEMALE -> Pieris-brassicae-FEMALE:1
+Pieris-rapae-FEMALE:1
+Pieris-napi-FEMALE -> Pieris-napi-FEMALE:1
+Pieris-napi-MALE:1
+Pieris-napi-MALE -> Pieris-rapae-MALE:1
+Plebeius-argus-MALE -> Plebeius-argus-MALE:1
+Polygonia-c-album -> Polygonia-c-album:1
+Polyommatus-icarus -> Polyommatus-icarus:1
+Pyrgus-malvae -> Pyrgus-malvae:1
+Pyronia-tithonus -> Pyronia-tithonus:1
+Satyrium-pruni -> Satyrium-pruni:1
+Satyrium-w-album -> Satyrium-w-album:1
+Thecla-betulae -> Thecla-betulae:1
+Thymelicus-lineola -> Thymelicus-acteon-FEMALE:1
+Thymelicus-lineola:1
+Vanessa-atalanta -> Vanessa-atalanta:1
+Vanessa-cardui -> Vanessa-cardui:1

@@ -1,4 +1,4 @@
-Total Accuracy: 84.8485%
+Total Accuracy: 89.3939%
 ------------------Confusion Matix------------------
 Aglais-urticae -> Aglais-urticae:1
 Anthocharis-cardamines-FEMALE -> Anthocharis-cardamines-FEMALE:1
@@ -28,7 +28,6 @@ Euphydryas-aurinia -> Euphydryas-aurinia:1
 Gonepteryx-rhamni -> Gonepteryx-rhamni:1
 Hamearis-lucina -> Hamearis-lucina:1
 Hesperia-comma -> Hesperia-comma:1
-Thymelicus-acteon-MALE:1
 Hipparchia-seleme -> Hipparchia-seleme:1
 Inachis-io -> Inachis-io:1
 Lasiommata-megera -> Lasiommata-megera:1
@@ -53,7 +52,7 @@ Pieris-brassicae-MALE:1
 Pieris-rapae-FEMALE:1
 Pieris-rapae-MALE:1
 Pieris-napi-FEMALE -> Pieris-napi-FEMALE:1
-Pieris-napi-MALE:1
+Pieris-napi-MALE -> Pieris-napi-MALE:1
 Plebeius-argus-MALE -> Plebeius-argus-MALE:1
 Polygonia-c-album -> Polygonia-c-album:1
 Pyrgus-malvae -> Pyrgus-malvae:1
@@ -62,7 +61,8 @@ Satyrium-pruni -> Satyrium-pruni:1
 Satyrium-w-album -> Satyrium-w-album:1
 Thecla-betulae -> Thecla-betulae:1
 Thymelicus-acteon-FEMALE -> Thymelicus-acteon-FEMALE:1
+Thymelicus-acteon-MALE -> Thymelicus-acteon-MALE:1
 Thymelicus-lineola -> Thymelicus-lineola:1
-Thymelicus-sylvestris:1
+Thymelicus-sylvestris -> Thymelicus-sylvestris:1
 Vanessa-atalanta -> Vanessa-atalanta:1
 Vanessa-cardui -> Vanessa-cardui:1
