@@ -9,7 +9,7 @@
 class Segmentor{
 private:
   void getBinMask( const cv::Mat& comMask, cv::Mat& binMask );
-  void changeImage( cv::Mat& _img, cv::Mat& _mask, cv::Mat& _res);
+  
   void showImage( cv::Mat& _img, cv::Mat& _mask);
 public:
   // Constructor
@@ -17,6 +17,7 @@ public:
   // Destructor
   ~Segmentor();
   // Main functionality of the class
+  void changeImage( cv::Mat& _img, cv::Mat& _mask, cv::Mat& _res);
   int segment(std::string filename, cv::Mat& res);
   int getSIFT(char* argv, cv::Mat& _res);
   void getMask(cv::Mat& image, cv::Mat& mask);

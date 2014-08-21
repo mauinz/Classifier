@@ -14,6 +14,8 @@ const string winName = "Image";
 const Scalar RED = Scalar(0,0,255);
 const Scalar BLUE = Scalar(255,0,0);
 const int iter = 1;
+const int grid = 32;
+
 
 Segmentor::Segmentor(){}
 Segmentor::~Segmentor(){}
@@ -116,9 +118,9 @@ void Segmentor::getMask(cv::Mat& image, cv::Mat& mask){
 
   // Perform grabcut on
   int max_x = image.cols, max_y = image.rows;
-  for(int i = 0; i < 32; i++){
-    for(int j = 0; j < 32; j++){
-      Point p1((int)(max_x*i/32),(int)(max_y*j/32));
+  for(int i = 0; i < grid; i++){
+    for(int j = 0; j < grid; j++){
+      Point p1((int)(max_x*i/grid),(int)(max_y*j/grid));
       bgdPxls.push_back(p1);
     } 
   }
@@ -128,6 +130,11 @@ void Segmentor::getMask(cv::Mat& image, cv::Mat& mask){
   changeMask( comMask, bgdPxls, fgdPxls );
   grabCut(image, comMask, rect, bgdModel, fgdModel, 2, GC_INIT_WITH_MASK );
   
+  cv::Mat image_copy, mask_copy = comMask;
+  
+  changeImage(image, mask_copy, image_copy);
+  imwrite("before.jpg",image_copy);
+
   vector<Point>::const_iterator it = bgdPxls.begin(), itEnd = bgdPxls.end();
   int x,y;
   for( ; it != itEnd; ++it ){
@@ -146,10 +153,10 @@ void Segmentor::getMask(cv::Mat& image, cv::Mat& mask){
   }
 
   getBinMask(comMask,mask);
-  changeImage(image, mask, res);
-  imshow(winName,res);
-  imwrite("final.jpg",res);
-  waitKey(0);
+  //changeImage(image, mask, res);
+  //imshow(winName,res);
+  //imwrite("after.jpg",res);
+  //waitKey(0);
   
   //std::cout <<"GC_BGD:"<< GC_BGD << std::endl;
   //changeImage(image, mask, _res);

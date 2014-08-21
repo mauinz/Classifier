@@ -80,13 +80,25 @@ int main(){
   */
 
   Segmentor *mySeg = new Segmentor;
-  cv::Mat img = cv::imread("image.tif"), res;
+  cv::Mat img = cv::imread("image.tif"), res,res_img;
   //mySeg->segment("image.tif",res);
   
   mySeg->getMask(img,res);
-  //imshow(winName,res);
-  //imwrite("10.jpg", res);
-  //cv::waitKey(0);
+  mySeg->changeImage(img, res, res_img);
+
+  int grid = 32;
+  int max_x = img.cols, max_y = img.rows;
+  for(int i = 0; i < grid; i++){
+    for(int j = 0; j < grid; j++){
+      cv::Point p1((int)(max_x*i/grid),(int)(max_y*j/grid));
+      circle(res_img, p1, 2, cv::Scalar(0,255,0),2);
+    } 
+  }
+  
+  imshow(winName,res_img);
+  
+  imwrite("32b.jpg", res_img);
+  cv::waitKey(0);
   
   delete mySeg;
 }
