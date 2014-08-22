@@ -14,6 +14,7 @@
 #include <iomanip>
 #include <boost/algorithm/string.hpp>
 #include "augmentor.hpp"
+#include "../Segmentor/segmentor.hpp"
 #include <boost/lambda/bind.hpp>
 #include <memory>
 #include <map>
@@ -75,87 +76,35 @@ void Augmentor::load2Dvector(std::vector<std::vector<string> > &print,std::strin
  
   myfile.close();
 }
-Mat Augmentor::asRowMatrix(const vector<Mat>& src, int rtype, double alpha = 1, double beta = 0) {
-    // Number of samples:
-    size_t n = src.size();
-    // Return empty matrix if no matrices given:
-    if(n == 0)
-        return Mat();
-    // dimensionality of (reshaped) samples
-    size_t d = src[0].total();
-    // Create resulting data matrix:
-    Mat data(n, d, rtype);
-    // Now copy data:
-    for(int i = 0; i < n; i++) {
-        //
-        if(src[i].empty()) {
-            string error_message = format("Image number %d was empty, please check your input data.", i);
-            CV_Error(CV_StsBadArg, error_message);
-        }
-        // Make sure data can be reshaped, throw a meaningful exception if not!
-        if(src[i].total() != d) {
-            string error_message = format("Wrong number of elements in matrix #%d! Expected %d was %d.", i, d, src[i].total());
-            CV_Error(CV_StsBadArg, error_message);
-        }
-        // Get a hold of the current row:
-        Mat xi = data.row(i);
-        // Make reshape happy by cloning for non-continuous matrices:
-        if(src[i].isContinuous()) {
-            src[i].reshape(1, 1).convertTo(xi, rtype, alpha, beta);
-        } else {
-            src[i].clone().reshape(1, 1).convertTo(xi, rtype, alpha, beta);
-        }
+
+void Augmentor::collectData(std::string file_path, cv::Mat &res){
+  Segmentor * mySeg = new Segmentor;
+  std::vector<std::vector<string> > seed_data;
+  cv::Mat pixel_matrix = cv::Mat(0,3, CV_8U);
+  load2Dvector(seed_data, file_path);
+  for(unsigned int i = 0; i < seed_data.size(); i++){
+    if(seed_data[i][2] == "train"){
+      
+      std::cout << "Reading: " << seed_data[i][0] << std::endl;
+      Mat img = imread(seed_data[i][0]), mask;
+      std::cout << "Detecting" << std::endl;
+      mySeg->getMask(img, mask);
+      for(int i = 0; i < img.cols; i++){
+	for(int j = 0; j < img.rows; j++){
+	  if((int)mask.at<uchar>(j,i) != 0){
+	    
+	    cv::Mat tmp = (cv::Mat_<uchar>(1,3) << img.at<cv::Vec3b>(j,i)[0], img.at<cv::Vec3b>(j,i)[0], img.at<cv::Vec3b>(j,i)[0]);
+	    //std::cout << "(" << i << "," << j << ") " << (int) img.at<cv::Vec3b>(j,i)[0] << ":" <<  (int)img.at<cv::Vec3b>(j,i)[1] << ":" <<  (int)img.at<cv::Vec3b>(j,i)[2] << std::endl;
+	    pixel_matrix.push_back(tmp);
+	  }
+	}	
+      }
     }
-    return data;
-}
-
-void Augmentor::augImage(std::string image_path){
-  cv::Mat image, channels[3];
-
-  image = imread(image_path, CV_LOAD_IMAGE_COLOR);
-  namedWindow( "Window", CV_WINDOW_AUTOSIZE );
-  imshow("Window",image);
-  waitKey();
-  split(image,channels);
-  imshow("Window",channels[0]);
-  waitKey();
-  imshow("Window",channels[1]);
-  waitKey();
-  imshow("Window",channels[2]);
-  waitKey();
-  std::cout << "image: " << image.type() << std::endl;
-  std::cout << "channels: " << channels[0].type() << std::endl;
-  std::vector<cv::Mat> channels_vec;
-  channels_vec.push_back(channels[0]);
-  channels_vec.push_back(channels[1]);
-  channels_vec.push_back(channels[2]);
+  }
   
-  cv::Mat input = asRowMatrix(image, image.type() );
-  cv::PCA pca(image, cv::Mat(),CV_PCA_DATA_AS_ROW);
-  Mat mean = pca.mean.clone();
-  Mat eigenvalues = pca.eigenvalues.clone();
-  Mat eigenvectors = pca.eigenvectors.clone();
-  Mat test = eigenvalues.row(0)*eigenvectors.row(0) + eigenvalues.row(1)*eigenvectors.row(1) + eigenvalues.row(2)*eigenvectors.row(2);
-  //test = test/3;
-  imshow("avg", norm_0_255(mean.reshape(1,  image.rows)));
-
-  waitKey();
-}
-cv::Mat Augmentor::norm_0_255(const cv::Mat& src) {
-    // Create and return normalized image:
-    Mat dst;
-    switch(src.channels()) {
-    case 1:
-        cv::normalize(src, dst, 0, 255, NORM_MINMAX, CV_8UC1);
-        break;
-    case 3:
-        cv::normalize(src, dst, 0, 255, NORM_MINMAX, CV_8UC3);
-        break;
-    default:
-        src.copyTo(dst);
-        break;
-    }
-    return dst;
+  res = pixel_matrix;
+  
+  delete mySeg;
 }
 /*
 
