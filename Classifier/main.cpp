@@ -90,8 +90,8 @@ int main(int argc,  char** argv){
   else if(((std::string)"FULLParams").compare(argv[1]) == 0){
 
     verbose = true;
-    std::string svm_1 = myclas->trainSVMParams(vf1,sf1,1,verbose);
-    myclas->testSVM(sf1,vf1,svm_1,1,verbose);
+    //std::string svm_1 = myclas->trainSVMParams(vf1,sf1,1,verbose);
+    //myclas->testSVM(sf1,vf1,svm_1,1,verbose);
 
     std::string svm_2 = myclas->trainSVMParams(vf2,sf2,2,verbose);
     myclas->testSVM(sf2,vf2,svm_2,2,verbose);

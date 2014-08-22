@@ -1,8 +1,8 @@
-Total Accuracy: 87.8788%
+Total Accuracy: 95.4545%
 ------------------Confusion Matix------------------
 Aglais-urticae -> Aglais-urticae:1
 Anthocharis-cardamines-FEMALE -> Anthocharis-cardamines-FEMALE:1
-Anthocharis-cardamines-MALE:1
+Anthocharis-cardamines-MALE -> Anthocharis-cardamines-MALE:1
 Apatura-iris -> Apatura-iris:1
 Aphantopus-hyperantus -> Aphantopus-hyperantus:1
 Argynnis-adippe -> Argynnis-adippe:1
@@ -17,7 +17,6 @@ Carterocephalus-palaemon -> Carterocephalus-palaemon:1
 Celastrina-argiolus -> Celastrina-argiolus:1
 Coenonympha-pamphilus -> Coenonympha-pamphilus:1
 Coenonympha-tullia -> Coenonympha-tullia:1
-Plebeius-argus-FEMALE:1
 Colias-croceus -> Colias-croceus:1
 Cupido-minimus -> Cupido-minimus:1
 Erebia-aethiops -> Erebia-aethiops:1
@@ -34,8 +33,8 @@ Leptidea-sinapis -> Leptidea-sinapis:1
 Limenitis-camilla -> Limenitis-camilla:1
 Lycaena-phlaeas -> Lycaena-phlaeas:1
 Lysandra-bellargus-FEMALE -> Lysandra-bellargus-FEMALE:1
-Lysandra-coridon-FEMALE:1
 Lysandra-bellargus-MALE -> Lysandra-bellargus-MALE:1
+Lysandra-coridon-FEMALE -> Lysandra-coridon-FEMALE:1
 Lysandra-coridon-MALE -> Lysandra-coridon-MALE:1
 Maniola-jurtina -> Maniola-jurtina:1
 Melanargia-galathea -> Melanargia-galathea:1
@@ -52,7 +51,8 @@ Pieris-rapae-FEMALE:1
 Pieris-brassicae-MALE -> Pieris-brassicae-MALE:1
 Pieris-napi-FEMALE -> Pieris-napi-FEMALE:1
 Pieris-napi-MALE -> Pieris-napi-MALE:1
-Pieris-rapae-MALE:1
+Pieris-rapae-MALE -> Pieris-rapae-MALE:1
+Plebeius-argus-FEMALE -> Plebeius-argus-FEMALE:1
 Plebeius-argus-MALE -> Plebeius-argus-MALE:1
 Polygonia-c-album -> Polygonia-c-album:1
 Polyommatus-icarus -> Polyommatus-icarus:1
@@ -61,7 +61,7 @@ Pyronia-tithonus -> Pyronia-tithonus:1
 Satyrium-pruni -> Satyrium-pruni:1
 Satyrium-w-album -> Satyrium-w-album:1
 Thecla-betulae -> Thecla-betulae:1
-Thymelicus-acteon-FEMALE -> Thymelicus-acteon-MALE:1
+Thymelicus-acteon-MALE -> Thymelicus-acteon-MALE:1
 Thymelicus-lineola -> Thymelicus-acteon-FEMALE:1
 Thymelicus-lineola:1
 Vanessa-atalanta -> Vanessa-atalanta:1
