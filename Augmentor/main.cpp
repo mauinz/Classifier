@@ -8,7 +8,7 @@ using namespace std;
 using namespace cv;
 
 int main(){
-
+  /*
   Augmentor * myAug = new Augmentor;
   
   cv::Mat res;
@@ -45,8 +45,8 @@ int main(){
   //cout << res.at<int>(0,0);
   delete myAug;
   return 0;
+  */
   
-  /*
 
   cv::Mat img = imread("image.tif",1);
   imshow("window",img);
@@ -67,9 +67,9 @@ int main(){
   Mat new_image = Mat::zeros( img.size(), img.type() );
 
   std::default_random_engine de(time(0));
-  std::normal_distribution<double> distribution(0.0,0.001);
+  std::normal_distribution<double> distribution(0.0,0.1);
   
-  alpha = (Mat_<float>(1,3) << distribution(de), distribution(de), distribution(de));
+  alpha = (Mat_<float>(1,3) << distribution(de)/600, distribution(de)/600, distribution(de)/600);
   
   transpose(alpha,alpha);
   //cout << eigenvalues.rows << endl;
@@ -109,6 +109,6 @@ int main(){
   imshow("window2",new_image);
   cv::waitKey(0);
   return 0;
-  */
+  
 }
 
