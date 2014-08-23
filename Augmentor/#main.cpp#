@@ -61,7 +61,6 @@ int main(){
   transpose(eigenvalues,eigenvalues);
   
   Mat alpha, rgb, tmp;
-  //Vec3b colour;
   
   Mat new_image = Mat::zeros( img.size(), img.type() );
 
@@ -71,10 +70,6 @@ int main(){
   alpha = (Mat_<float>(1,3) << distribution(de), distribution(de), distribution(de));
   
   transpose(alpha,alpha);
-  //cout << eigenvalues.rows << endl;
-  //cout << eigenvalues.cols << endl;
-  //cout << eigenvalues.type() << endl;
-  //cout << alpha.type() << endl;
   tmp = alpha*eigenvalues;
   transpose(eigenvectors,eigenvectors);
   transpose(tmp,tmp);
@@ -105,8 +100,6 @@ int main(){
       }
     }
   }
-  imshow("window2",new_image);
-  cv::waitKey(0);
   return 0;
 }
 

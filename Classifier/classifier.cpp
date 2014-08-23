@@ -18,6 +18,7 @@
 #include "../Segmentor/segmentor.hpp"
 #include <boost/lambda/bind.hpp>
 #include <memory>
+#include <math.h>
 #include <map>
 
 using namespace std;
@@ -34,6 +35,7 @@ const bool use_hist_pyramid = true;
 const bool use_hist = true;
 const bool use_hsv = true;
 const bool use_flips = true;
+const bool use_pca = true;
 //const float hist_factor = 0.2;
 
 Classifier::Classifier(){
@@ -306,7 +308,7 @@ std::string Classifier::trainSVM(std::string vocab_path, std::string train_path,
   if(verbose){
     cout << "Reading reponse histograms from training data" << endl;
   }
-  extractTrainingData(train_path,  classes_training_data, vocabulary);
+  extractTrainingData(train_path,  classes_training_data, vocabulary, seed);
   
   if(verbose){  
     cout << "Training with " << classes_training_data.size() << " classes." <<endl;
@@ -373,39 +375,64 @@ std::string Classifier::trainSVM(std::string vocab_path, std::string train_path,
 }
 
 //=======================================================================================
-void Classifier::extractTrainingData(std::string filepath, std::map<string,Mat>& classes_training_data, cv::Mat vocabulary,bool verbose ){
+void Classifier::extractTrainingData(std::string filepath, std::map<string,Mat>& classes_training_data, cv::Mat vocabulary, int seed, bool verbose ){
 //=======================================================================================
   cv::initModule_nonfree();
+
+  Mat eigenvalues, eigenvectors, res;
   
+  std::string pca_file = "PCA/pca_" + to_string(seed) + ".yml";
+  FileStorage fs(pca_file, FileStorage::READ);
+  fs["Eigenvalues"] >> eigenvalues;
+  fs["Eigenvector"] >> eigenvectors;
   
   if(verbose){
     cout << "Extracting Training Data" << endl;
     cout << "Reading seed information from file: "<< filepath <<endl;
   }
   vector<KeyPoint> keypoints;
-  cv::Mat full_hist,full_hist_flip;
-  cv::Mat img, mask,img_flip,mask_flip;
-  std::vector<std::vector<string> > seed;
-  load2Dvector(seed,filepath);
+  cv::Mat full_hist;
+  cv::Mat img, mask,img_flip,mask_flip,img_pca,img_flip_pca;
+  std::vector<std::vector<string> > img_list;
+  load2Dvector(img_list,filepath);
   
   BOWImgDescriptorExtractor bowide(extractor,matcher);
   bowide.setVocabulary(vocabulary);
   std::cout << "Descriptor size: " << bowide.descriptorSize() << std::endl; 
   
-  for(unsigned int i = 0; i < seed.size(); i++){
-    if(seed[i][2] == "train"){
-      img = imread(seed[i][0]);
+  for(unsigned int i = 0; i < img_list.size(); i++){
+    if(img_list[i][2] == "train"){
+      img = imread(img_list[i][0]);
       myseg->getMask(img, mask);
       getFeatures(img,mask,full_hist,&bowide);
-      if(classes_training_data.count(seed[i][1]) == 0) { //not yet created...
-	classes_training_data[seed[i][1]].create(0,(full_hist.cols),full_hist.type());
+      if(classes_training_data.count(img_list[i][1]) == 0) { //not yet created...
+	classes_training_data[img_list[i][1]].create(0,(full_hist.cols),full_hist.type());
       }
-      classes_training_data[seed[i][1]].push_back(full_hist);
-      if(use_flips){
+      classes_training_data[img_list[i][1]].push_back(full_hist);
+      full_hist.release();
+      if(use_flips && use_pca){
 	flip(img,img_flip,1);
 	flip(mask,mask_flip,1);
-	getFeatures(img_flip,mask_flip,full_hist_flip,&bowide);
-	classes_training_data[seed[i][1]].push_back(full_hist_flip);
+	getFeatures(img_flip,mask_flip,full_hist,&bowide);
+	classes_training_data[img_list[i][1]].push_back(full_hist);
+	full_hist.release();
+	pcaImage(img, eigenvalues, eigenvectors, img_pca);
+	getFeatures(img_pca,mask,full_hist,&bowide);
+	classes_training_data[img_list[i][1]].push_back(full_hist);
+	full_hist.release();
+      }
+      else if(use_pca){
+	pcaImage(img, eigenvalues, eigenvectors, img_pca);
+	getFeatures(img_pca,mask,full_hist,&bowide);
+	classes_training_data[img_list[i][1]].push_back(full_hist);
+	full_hist.release();
+      }
+      else if(use_flips){
+	flip(img,img_flip,1);
+	flip(mask,mask_flip,1);
+	getFeatures(img_flip,mask_flip,full_hist,&bowide);
+	classes_training_data[img_list[i][1]].push_back(full_hist);
+	full_hist.release();
       }
     }
   }
@@ -436,7 +463,7 @@ std::string Classifier::trainSVMParams(std::string vocab_path, std::string train
   if(verbose){
     cout << "Reading reponse histograms from training data" << endl;
   }
-  extractTrainingData(train_path,  classes_training_data, vocabulary);
+  extractTrainingData(train_path,  classes_training_data, vocabulary, seed);
   
   if(verbose){  
     cout << "Training with " << classes_training_data.size() << " classes." <<endl;
@@ -635,8 +662,6 @@ void Classifier::testSVM(std::string seed_path, std::string vocab_path, std::str
   delete myseg;
 }
 
-
-
 //=======================================================================================
 void Classifier::getHist(cv::Mat src, cv::Mat &res, cv::Mat mask, bool verbose){
 //=======================================================================================
@@ -739,7 +764,9 @@ void Classifier::getHist(cv::Mat src, cv::Mat &res, cv::Mat mask, bool verbose){
 
 
 }
+//=======================================================================================
 void Classifier::getHistPyramid(cv::Mat src, cv::Mat &res, cv::Mat mask, bool verbose){
+//=======================================================================================
   cv::Mat full;
   int step_y = src.rows/hist_level, step_x = src.cols/hist_level;
 
@@ -763,8 +790,9 @@ void Classifier::getHistPyramid(cv::Mat src, cv::Mat &res, cv::Mat mask, bool ve
   full /= total.val[0];
   res = full;
 }
-
+//=======================================================================================
 void Classifier::getFeatures(cv::Mat img,cv::Mat mask, cv::Mat &res, BOWImgDescriptorExtractor * bowide){
+//=======================================================================================
   double hu[7];
   getmoments(mask,hu);
   vector<KeyPoint> keypoints;
@@ -791,13 +819,52 @@ void Classifier::getFeatures(cv::Mat img,cv::Mat mask, cv::Mat &res, BOWImgDescr
   }
   res=full_hist;
 }
-
+//=======================================================================================
 void Classifier::getmoments(cv::Mat binmask, double hu[7]){
+//=======================================================================================
   vector<float> res;
   cv::Moments mom = cv::moments(binmask,true);
   cv::HuMoments(mom, hu);
 }
+//=======================================================================================
+void Classifier::pcaImage(cv::Mat img, cv::Mat eigenvalues, cv::Mat eigenvectors, cv::Mat &res){
+//=======================================================================================
 
+  transpose(eigenvalues,eigenvalues);
+  
+  Mat alpha, rgb, tmp;
+  
+  Mat new_image = Mat::zeros( img.size(), img.type() );
+
+  std::default_random_engine de(time(0));
+  std::normal_distribution<double> distribution(0.0,0.001);
+  
+  alpha = (Mat_<float>(1,3) << distribution(de), distribution(de), distribution(de));
+  
+  transpose(alpha,alpha);
+  tmp = alpha*eigenvalues;
+  transpose(eigenvectors,eigenvectors);
+  transpose(tmp,tmp);
+  rgb = eigenvectors*tmp;
+  
+  for( int y = 0; y < img.rows; y++ ){
+    for( int x = 0; x < img.cols; x++ ){
+      for( int c = 0; c < 3; c++ ){
+	int val = (int)img.at<Vec3b>(y,x)[c] + (int)round(rgb.at<float>(0,c));
+	if(val <= 0){
+	  new_image.at<Vec3b>(y,x)[c] = (uchar)0;
+	}
+	else if(val >= 255){
+	  new_image.at<Vec3b>(y,x)[c] = (uchar)255;
+	}
+	else{
+	  new_image.at<Vec3b>(y,x)[c] = (uchar)val;
+	}
+      }
+    }
+  }
+  res = new_image;
+}
 //Function which is visible to the python wrapper 
 std::string classify(std::string svm_path, std::string vocab_path, std::string img_src)
 {

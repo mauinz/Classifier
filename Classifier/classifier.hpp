@@ -52,13 +52,14 @@ public:
   int getWords(std::string folderpath,int seed, bool verbose = false);
   int makeFileList(std::string folderpath, int seed);
   void checkFolders(std::string folderpath);
-  void extractTrainingData(std::string filepath, std::map<std::string,cv::Mat>& classes_training_data, cv::Mat vocabulary, bool verbose = false);
+  void extractTrainingData(std::string filepath, std::map<std::string,cv::Mat>& classes_training_data, cv::Mat vocabulary, int seed, bool verbose = false);
   std::string trainSVM(std::string vocab_path, std::string train_path, int seed, bool verbose = false);
   std::string trainSVMParams(std::string vocab_path, std::string train_path, int seed, bool verbose = false);
   void testSVM(std::string seed_path, std::string vocab_path, std::string svm_path, int seed, bool verbose = false);
   void getHist(cv::Mat src, cv::Mat &res, cv::Mat mask, bool verbose = false);
   void getHistPyramid(cv::Mat src, cv::Mat &res, cv::Mat mask, bool verbose = false);
   void getmoments(cv::Mat binmask, double hu[7]);
+  void pcaImage(cv::Mat img, cv::Mat eigenvalues, cv::Mat eigenvectors, cv::Mat &res);
 };
 
 #endif
