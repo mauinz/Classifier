@@ -373,7 +373,32 @@ std::string Classifier::trainSVM(std::string vocab_path, std::string train_path,
   }
   return folder_name.str();
 }
+void Augmentor::collectData(std::string file_path, cv::Mat mask, cv::Mat &res){
+  std::vector<std::vector<string> > seed_data;
+  cv::Mat pixel_matrix = cv::Mat(0,3, CV_8U);
+  load2Dvector(seed_data, file_path);
+  for(unsigned int i = 0; i < seed_data.size(); i++){
+    if(seed_data[i][2] == "train"){
 
+      std::cout << "Reading: " << seed_data[i][0] << std::endl;
+      Mat img = imread(seed_data[i][0]), mask;
+      std::cout << "Detecting" << std::endl;
+      mySeg->getMask(img, mask);
+      for(int i = 0; i < img.cols; i++){
+        for(int j = 0; j < img.rows; j++){
+          if((int)mask.at<uchar>(j,i) != 0){
+
+	    cv::Mat tmp = (cv::Mat_<uchar>(1,3) << img.at<cv::Vec3b>(j,i)[0], img.at<cv::Vec3b>(j,i)[0], img.at<cv::Vec3b>(j,i)[0]);
+            //std::cout << "(" << i << "," << j << ") " << (int) img.at<cv::Vec3b>(j,i)[0] << ":" <<  (int)img.at<cv::Vec3b>(j,i)[1] << ":" <<  (int)img.at<cv::Vec3b>(j,i)[2] << std::endl;                 
+            pixel_matrix.push_back(tmp);
+          }
+        }
+      }
+    }
+  }
+  pixel_matrix.convertTo(res,CV_32F);
+
+}
 //=======================================================================================
 void Classifier::extractTrainingData(std::string filepath, std::map<string,Mat>& classes_training_data, cv::Mat vocabulary, int seed, bool verbose ){
 //=======================================================================================
@@ -501,7 +526,7 @@ std::string Classifier::trainSVMParams(std::string vocab_path, std::string train
 
     //copy class samples and label
     if(verbose){
-      cout << "adding " << classes_training_data[class_].rows << " positive" << endl;
+      cout << "adding " << classes_training_data[class_].rows << " positive: " << (i+1) << "out of " << class_names.size() << endl;
     }
     samples.push_back(classes_training_data[class_]);
     Mat class_label = Mat::ones(classes_training_data[class_].rows, 1, CV_32FC1);

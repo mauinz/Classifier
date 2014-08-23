@@ -9,8 +9,8 @@ using namespace cv;
 
 int main(){
 
-  //Augmentor * myAug = new Augmentor;
-  /*
+  Augmentor * myAug = new Augmentor;
+  
   cv::Mat res;
   std::string seed[5];
   seed[0] = "/home/matthew/Documents/classifier/Classifier/Seeds/test_seed_1";
@@ -45,7 +45,8 @@ int main(){
   //cout << res.at<int>(0,0);
   delete myAug;
   return 0;
-  */
+  
+  /*
 
   cv::Mat img = imread("image.tif",1);
   imshow("window",img);
@@ -108,5 +109,6 @@ int main(){
   imshow("window2",new_image);
   cv::waitKey(0);
   return 0;
+  */
 }
 

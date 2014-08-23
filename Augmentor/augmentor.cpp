@@ -101,8 +101,7 @@ void Augmentor::collectData(std::string file_path, cv::Mat &res){
       }
     }
   }
-  
-  res = pixel_matrix;
+  pixel_matrix.convertTo(res,CV_32F);
   
   delete mySeg;
 }
