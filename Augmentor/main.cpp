@@ -7,7 +7,9 @@ using namespace std;
 using namespace cv;
 
 int main(){
+
   Augmentor * myAug = new Augmentor;
+  /*
   cv::Mat res;
   std::string seed[5];
   seed[0] = "/home/matthew/Documents/classifier/Classifier/Seeds/test_seed_1";
@@ -15,13 +17,13 @@ int main(){
   seed[2] = "/home/matthew/Documents/classifier/Classifier/Seeds/test_seed_3";
   seed[3] = "/home/matthew/Documents/classifier/Classifier/Seeds/test_seed_4";
   seed[4] = "/home/matthew/Documents/classifier/Classifier/Seeds/test_seed_5";
-  int num_components = 3;
+  //int num_components = 3;
 
 
   // Perform a PCA:
   for(int i = 1; i < 6; i++){
     myAug->collectData(seed[i-1],res);
-    PCA pca(res, Mat(), PCA::DATA_AS_ROW, num_components);
+    PCA pca(res, Mat(), PCA::DATA_AS_ROW);
 
     Mat mean = pca.mean.clone();
     Mat eigenvalues = pca.eigenvalues.clone();
@@ -41,6 +43,12 @@ int main(){
   
   //cout << res.at<int>(0,0);
   delete myAug;
+  return 0;
+  */
+  cv::Mat img = imread("image.tif",1);
+  imshow("window",img);
+  
+
   return 0;
 }
 
