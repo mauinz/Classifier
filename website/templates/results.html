@@ -12,9 +12,13 @@
     <img src = "{{filename}}" class="img-thumbnail"><br>
     <br> <br>
     <h2>Classification: {{res}} </h2>
+    
+    <br>
+    <button class="button" onClick="window.open('https://www.google.co.uk/search?tbm=isch&q={{res}}');"><span class="icon">Search Google images</span></button>
     <br>
     <h2>An extract from <a href="{{url}}">Wikipedia</a></h2> 
     <br>
+    <!--<iframe src="{{url}}"  width="800" height="800" align="middle"></iframe>-->
     {{wiki|safe}}
     <br>
     <br>

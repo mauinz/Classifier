@@ -1,4 +1,4 @@
-Total Accuracy: 93.9394%
+Total Accuracy: 95.4545%
 ------------------Confusion Matix------------------
 Aglais-urticae -> Aglais-urticae:1
 Anthocharis-cardamines-FEMALE -> Anthocharis-cardamines-FEMALE:1
@@ -30,7 +30,6 @@ Hipparchia-seleme -> Hipparchia-seleme:1
 Inachis-io -> Inachis-io:1
 Lasiommata-megera -> Lasiommata-megera:1
 Leptidea-sinapis -> Leptidea-sinapis:1
-Pieris-brassicae-MALE:1
 Limenitis-camilla -> Limenitis-camilla:1
 Lycaena-phlaeas -> Lycaena-phlaeas:1
 Lysandra-bellargus-FEMALE -> Lysandra-bellargus-FEMALE:1
@@ -47,6 +46,7 @@ Ochlodes-faunus -> Ochlodes-faunus:1
 Papilio-machaon -> Papilio-machaon:1
 Pararge-aegeria -> Pararge-aegeria:1
 Pieris-brassicae-MALE -> Pieris-brassicae-FEMALE:1
+Pieris-brassicae-MALE:1
 Pieris-napi-FEMALE -> Pieris-napi-FEMALE:1
 Pieris-napi-MALE -> Pieris-napi-MALE:1
 Pieris-rapae-FEMALE -> Pieris-rapae-FEMALE:1

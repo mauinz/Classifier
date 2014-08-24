@@ -54,6 +54,7 @@ def butterflies():
             res = classifier.classify(SVM_PATH,VOCAB_PATH, filepath)
             page = wikipedia.page(res)
             url = page.url
+            #wiki = page.html()
             wiki = page.content
             try:
                 index = wiki.index('\n\n\n== See')

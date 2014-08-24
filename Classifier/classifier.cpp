@@ -36,6 +36,7 @@ const bool use_hist = true;
 const bool use_hsv = true;
 const bool use_flips = true;
 const bool use_pca = true;
+const int img_total = 571; // estimate of number of images
 //const float hist_factor = 0.2;
 
 Classifier::Classifier(){
@@ -373,32 +374,7 @@ std::string Classifier::trainSVM(std::string vocab_path, std::string train_path,
   }
   return folder_name.str();
 }
-void Augmentor::collectData(std::string file_path, cv::Mat mask, cv::Mat &res){
-  std::vector<std::vector<string> > seed_data;
-  cv::Mat pixel_matrix = cv::Mat(0,3, CV_8U);
-  load2Dvector(seed_data, file_path);
-  for(unsigned int i = 0; i < seed_data.size(); i++){
-    if(seed_data[i][2] == "train"){
 
-      std::cout << "Reading: " << seed_data[i][0] << std::endl;
-      Mat img = imread(seed_data[i][0]), mask;
-      std::cout << "Detecting" << std::endl;
-      mySeg->getMask(img, mask);
-      for(int i = 0; i < img.cols; i++){
-        for(int j = 0; j < img.rows; j++){
-          if((int)mask.at<uchar>(j,i) != 0){
-
-	    cv::Mat tmp = (cv::Mat_<uchar>(1,3) << img.at<cv::Vec3b>(j,i)[0], img.at<cv::Vec3b>(j,i)[0], img.at<cv::Vec3b>(j,i)[0]);
-            //std::cout << "(" << i << "," << j << ") " << (int) img.at<cv::Vec3b>(j,i)[0] << ":" <<  (int)img.at<cv::Vec3b>(j,i)[1] << ":" <<  (int)img.at<cv::Vec3b>(j,i)[2] << std::endl;                 
-            pixel_matrix.push_back(tmp);
-          }
-        }
-      }
-    }
-  }
-  pixel_matrix.convertTo(res,CV_32F);
-
-}
 //=======================================================================================
 void Classifier::extractTrainingData(std::string filepath, std::map<string,Mat>& classes_training_data, cv::Mat vocabulary, int seed, bool verbose ){
 //=======================================================================================
@@ -862,9 +838,9 @@ void Classifier::pcaImage(cv::Mat img, cv::Mat eigenvalues, cv::Mat eigenvectors
   Mat new_image = Mat::zeros( img.size(), img.type() );
 
   std::default_random_engine de(time(0));
-  std::normal_distribution<double> distribution(0.0,0.001);
+  std::normal_distribution<double> distribution(0.0,0.1);
   
-  alpha = (Mat_<float>(1,3) << distribution(de), distribution(de), distribution(de));
+  alpha = (Mat_<float>(1,3) << distribution(de)/img_total, distribution(de)/img_total, distribution(de)/img_total);
   
   transpose(alpha,alpha);
   tmp = alpha*eigenvalues;

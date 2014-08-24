@@ -1,4 +1,4 @@
-Total Accuracy: 95.4545%
+Total Accuracy: 98.4848%
 ------------------Confusion Matix------------------
 Aglais-urticae -> Aglais-urticae:1
 Anthocharis-cardamines-FEMALE -> Anthocharis-cardamines-FEMALE:1
@@ -43,14 +43,13 @@ Melitaea-cinxia -> Melitaea-cinxia:1
 Neozephyrus-quercus-FEMALE -> Neozephyrus-quercus-FEMALE:1
 Neozephyrus-quercus-MALE -> Neozephyrus-quercus-MALE:1
 Ochlodes-faunus -> Ochlodes-faunus:1
-Thymelicus-sylvestris:1
 Papilio-machaon -> Papilio-machaon:1
 Pararge-aegeria -> Pararge-aegeria:1
 Pieris-brassicae-FEMALE -> Pieris-brassicae-FEMALE:1
-Pieris-rapae-FEMALE:1
 Pieris-brassicae-MALE -> Pieris-brassicae-MALE:1
 Pieris-napi-FEMALE -> Pieris-napi-FEMALE:1
 Pieris-napi-MALE -> Pieris-napi-MALE:1
+Pieris-rapae-FEMALE -> Pieris-rapae-FEMALE:1
 Pieris-rapae-MALE -> Pieris-rapae-MALE:1
 Plebeius-argus-FEMALE -> Plebeius-argus-FEMALE:1
 Plebeius-argus-MALE -> Plebeius-argus-MALE:1
@@ -64,5 +63,6 @@ Thecla-betulae -> Thecla-betulae:1
 Thymelicus-acteon-MALE -> Thymelicus-acteon-MALE:1
 Thymelicus-lineola -> Thymelicus-acteon-FEMALE:1
 Thymelicus-lineola:1
+Thymelicus-sylvestris -> Thymelicus-sylvestris:1
 Vanessa-atalanta -> Vanessa-atalanta:1
 Vanessa-cardui -> Vanessa-cardui:1
