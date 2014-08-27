@@ -50,9 +50,9 @@ Classifier::Classifier(){
 }
 
 Classifier::~Classifier(){
-  delete detector;
-  delete extractor;
-  delete matcher;
+  //delete detector;
+  //delete extractor;
+  //delete matcher;
   delete myseg;
 }
 template <typename T>
@@ -308,6 +308,7 @@ int Classifier::kFoldFileList(std::string folderpath, int seed){
     //std::cout << test_count[i] << std::endl;
   }
   for(int test = 0; test < 10; test++){
+    cout << test << endl;
     std::vector<std::vector<string> > image_split;
     for(unsigned int i = 0; i < filelist.size(); i++){
       std::vector<string> tmp;
@@ -323,6 +324,7 @@ int Classifier::kFoldFileList(std::string folderpath, int seed){
       image_split.push_back(tmp);
     }
     save2Dvector(image_split,test);
+    cout << "saving seed " << test << endl;
   }
 
   return 0;

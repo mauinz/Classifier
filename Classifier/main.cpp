@@ -64,6 +64,7 @@ int main(int argc,  char** argv){
   // make file list for kfold test
   else if(((std::string)"kfoldfiles").compare(argv[1]) == 0){
     myclas->kFoldFileList(img_folder,1);
+    cout << "fine" << endl;
   }
 
 
@@ -130,7 +131,7 @@ int main(int argc,  char** argv){
     */
   }
   
-    
+  cout << "still fine" << endl;  
   delete myclas;
   return 0;
 }
