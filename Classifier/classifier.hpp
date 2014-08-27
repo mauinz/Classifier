@@ -51,6 +51,7 @@ public:
   void getFeatures(cv::Mat img,cv::Mat mask, cv::Mat &res, BOWImgDescriptorExtractor * bowide);
   int getWords(std::string folderpath,int seed, bool verbose = false);
   int makeFileList(std::string folderpath, int seed);
+  int kFoldFileList(std::string folderpath, int seed);
   void checkFolders(std::string folderpath);
   void extractTrainingData(std::string filepath, std::map<std::string,cv::Mat>& classes_training_data, cv::Mat vocabulary, int seed, bool verbose = false);
   std::string trainSVM(std::string vocab_path, std::string train_path, int seed, bool verbose = false);

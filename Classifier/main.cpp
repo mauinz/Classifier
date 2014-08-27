@@ -61,6 +61,11 @@ int main(int argc,  char** argv){
     myclas->makeFileList(img_folder,4);
     myclas->makeFileList(img_folder,5);
   }
+  // make file list for kfold test
+  else if(((std::string)"kfoldfiles").compare(argv[1]) == 0){
+    myclas->kFoldFileList(img_folder,1);
+  }
+
 
   //checkFolders() TEST
   else if(((std::string)"checkFolders").compare(argv[1]) == 0){

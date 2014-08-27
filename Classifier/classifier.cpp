@@ -283,6 +283,51 @@ int Classifier::makeFileList(std::string folderpath, int seed){
   return 0;
   
 }
+int Classifier::kFoldFileList(std::string folderpath, int seed){
+
+  std::vector<std::string> filelist;
+
+  int count = 10;
+  // the random test sets
+  srand (seed);
+
+  // Store a list of all files
+  for ( boost::filesystem::recursive_directory_iterator end, dir(folderpath); 
+	dir != end; ++dir ) {
+    if(boost::filesystem::is_regular_file(*dir)){
+      filelist.push_back(dir->path().string());
+    }
+  }
+  
+  // Choose which test case each image will belong to
+  int test_count[filelist.size()];
+  
+  for(unsigned int i = 0; i < filelist.size(); i++){
+    //std::cout << folderlist[i] << ": " << count << std::endl;
+    test_count[i] = rand() % count;
+    //std::cout << test_count[i] << std::endl;
+  }
+  for(int test = 0; test < 10; test++){
+    std::vector<std::vector<string> > image_split;
+    for(unsigned int i = 0; i < filelist.size(); i++){
+      std::vector<string> tmp;
+      boost::filesystem::path dir(filelist[i]);
+      tmp.push_back(dir.string());
+      tmp.push_back(dir.parent_path().filename().string());
+      if(test_count[i] == test){
+	tmp.push_back("test");
+      }
+      else{
+	tmp.push_back("train");
+      }
+      image_split.push_back(tmp);
+    }
+    save2Dvector(image_split,test);
+  }
+
+  return 0;
+
+}
 // vocab_path = Path of vocabulary file
 // train_path = Path of seed file
 //=======================================================================================
