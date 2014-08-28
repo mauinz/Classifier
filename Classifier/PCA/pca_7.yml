@@ -1,0 +1,13 @@
+%YAML:1.0
+Eigenvalues: !!opencv-matrix
+   rows: 3
+   cols: 1
+   dt: f
+   data: [ 7.57151074e+03, 0., -4.88281250e-04 ]
+Eigenvector: !!opencv-matrix
+   rows: 3
+   cols: 3
+   dt: f
+   data: [ 5.77350259e-01, 5.77350259e-01, 5.77350318e-01,
+       7.07106829e-01, -7.07106829e-01, 0., -4.08248365e-01,
+       -4.08248365e-01, 8.16496551e-01 ]

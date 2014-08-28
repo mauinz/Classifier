@@ -3,7 +3,7 @@ Eigenvalues: !!opencv-matrix
    rows: 3
    cols: 1
    dt: f
-   data: [ 1.96945469e+04, 0., 0. ]
+   data: [ 7.64366309e+03, 0., 0. ]
 Eigenvector: !!opencv-matrix
    rows: 3
    cols: 3

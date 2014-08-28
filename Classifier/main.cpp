@@ -29,11 +29,35 @@ int main(int argc,  char** argv){
   std::string svm_file =  "/home/matthew/Documents/classifier/Classifier/SVMS_12014-08-01.12:33:55";
   std::string test_image = "/home/matthew/Documents/classifier/Classifier/image.tif";
   std::string test_image_2 = "/home/matthew/Desktop/1913939_253854910507_7156307_n.jpg";
+  
+  std::string seedfile[10];
+  seedfile[0] = "/home/matthew/Documents/classifier/Classifier/Seeds/test_seed_0";
+  seedfile[1] = "/home/matthew/Documents/classifier/Classifier/Seeds/test_seed_1";
+  seedfile[2] = "/home/matthew/Documents/classifier/Classifier/Seeds/test_seed_2";
+  seedfile[3] = "/home/matthew/Documents/classifier/Classifier/Seeds/test_seed_3";
+  seedfile[4] = "/home/matthew/Documents/classifier/Classifier/Seeds/test_seed_4";
+  seedfile[5] = "/home/matthew/Documents/classifier/Classifier/Seeds/test_seed_5";
+  seedfile[6] = "/home/matthew/Documents/classifier/Classifier/Seeds/test_seed_6";
+  seedfile[7] = "/home/matthew/Documents/classifier/Classifier/Seeds/test_seed_7";
+  seedfile[8] = "/home/matthew/Documents/classifier/Classifier/Seeds/test_seed_8";
+  seedfile[9] = "/home/matthew/Documents/classifier/Classifier/Seeds/test_seed_9";
+
+  std::string vocabfile[10];
+  vocabfile[0] = "/home/matthew/Documents/classifier/Classifier/Vocabularies/Vocabulary_0_2014-08-27.19:24:57.yml";
+  vocabfile[1] = "/home/matthew/Documents/classifier/Classifier/Vocabularies/Vocabulary_1_2014-08-27.20:32:47.yml";
+  vocabfile[2] = "/home/matthew/Documents/classifier/Classifier/Vocabularies/Vocabulary_2_2014-08-27.21:41:41.yml";
+  vocabfile[3] = "/home/matthew/Documents/classifier/Classifier/Vocabularies/Vocabulary_3_2014-08-27.22:49:23.yml";
+  vocabfile[4] = "/home/matthew/Documents/classifier/Classifier/Vocabularies/Vocabulary_4_2014-08-27.23:58:47.yml";
+  vocabfile[5] = "/home/matthew/Documents/classifier/Classifier/Vocabularies/Vocabulary_5_2014-08-28.01:06:43.yml";
+  vocabfile[6] = "/home/matthew/Documents/classifier/Classifier/Vocabularies/Vocabulary_6_2014-08-28.02:15:34.yml";
+  vocabfile[7] = "/home/matthew/Documents/classifier/Classifier/Vocabularies/Vocabulary_7_2014-08-28.03:22:33.yml";
+  vocabfile[8] = "/home/matthew/Documents/classifier/Classifier/Vocabularies/Vocabulary_8_2014-08-28.04:30:38.yml";
+  vocabfile[9] = "/home/matthew/Documents/classifier/Classifier/Vocabularies/Vocabulary_9_2014-08-28.05:36:45.yml";
+  
   bool verbose = false;
   int seed = 1;
   
   Classifier* myclas = new Classifier;
-
   if(argc == 1){
     return 0;
   }
@@ -46,11 +70,9 @@ int main(int argc,  char** argv){
   
   // getWords() TEST
   if(((std::string)"getWords").compare(argv[1]) == 0){
-    myclas->getWords(sf1, 1, verbose);
-    myclas->getWords(sf2, 2, verbose);
-    myclas->getWords(sf3, 3, verbose);
-    myclas->getWords(sf4, 4, verbose);
-    myclas->getWords(sf5, 5, verbose);
+       for(int i = 0; i < 10; i++){
+      myclas->getWords(seedfile[i], i, verbose);
+    }
   }
   
   // makeFileList() TEST
@@ -96,20 +118,10 @@ int main(int argc,  char** argv){
   else if(((std::string)"FULLParams").compare(argv[1]) == 0){
 
     verbose = true;
-    std::string svm_1 = myclas->trainSVMParams(vf1,sf1,1,verbose);
-    myclas->testSVM(sf1,vf1,svm_1,1,verbose);
-
-    std::string svm_2 = myclas->trainSVMParams(vf2,sf2,2,verbose);
-    myclas->testSVM(sf2,vf2,svm_2,2,verbose);
-
-    std::string svm_3 = myclas->trainSVMParams(vf3,sf3,3,verbose);
-    myclas->testSVM(sf3,vf3,svm_3,3,verbose);
-
-    std::string svm_4 = myclas->trainSVMParams(vf4,sf4,4,verbose);
-    myclas->testSVM(sf4,vf4,svm_4,4,verbose);
-
-    std::string svm_5 = myclas->trainSVMParams(vf5,sf5,5,verbose);
-    myclas->testSVM(sf5,vf5,svm_5,5,verbose);
+    for(int i = 0; i < 10; i++){
+      std::string svm = myclas->trainSVMParams(vocabfile[i],seedfile[i],i,verbose);
+      myclas->testSVM(seedfile[i],vocabfile[i],svm,i,verbose);
+    }
   }
   
   else if(((std::string)"hist").compare(argv[1]) == 0){
