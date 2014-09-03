@@ -2,10 +2,11 @@ import os, sys, classifier, wikipedia
 from flask import Flask, render_template, request, redirect, url_for, send_from_directory
 from werkzeug.utils import secure_filename
 
-UPLOAD_FOLDER = '/home/matthew/Documents/classifier/website/uploads'
-ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif', 'tif', 'tiff'])
-SVM_PATH = '/home/matthew/Documents/classifier/Classifier/SVMS_1_2014-08-04.16:30:24'
-VOCAB_PATH = '/home/matthew/Documents/classifier/Classifier/Vocabularies/Vocabulary_1_2014-08-05.19:46:07.yml'
+IMAGES_FOLDER = '/home/matthew/Documents/classifier/website/uploads'
+UPLOAD_FOLDER = '/home/matthew/Documents/classifier/website/images'
+ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif', 'tif', 'tiff','JPG'])
+SVM_PATH = '/home/matthew/Documents/classifier/Classifier/SVM_final/SVMS_1_2014-08-23.15:53:04'
+VOCAB_PATH = '/home/matthew/Documents/classifier/Classifier/Vocabularies/Vocabulary_1_2014-08-19.18:28:23.yml'
 
  
 
@@ -13,6 +14,7 @@ VOCAB_PATH = '/home/matthew/Documents/classifier/Classifier/Vocabularies/Vocabul
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['IMAGES_FOLDER'] = UPLOAD_FOLDER
 #app.debug = True
 #@app.route('/')
 #def index():
@@ -41,6 +43,10 @@ def me():
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+@app.route('/images/<filename>')
+def image_file(filename):
+    return send_from_directory(app.config['IMAGES_FOLDER'], filename)
 
 @app.route('/butterflies',methods=['GET','POST'])
 def butterflies():

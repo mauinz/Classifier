@@ -96,32 +96,31 @@ int main(){
   
   cv::waitKey(0);
   */
-  //std::string seed_path = "/home/matthew/Documents/classifier/Classifier/Seeds/test_seed_1";
-  //std::vector<std::vector<string> > test_images;  
+  std::string seed_path = "/home/matthew/Documents/classifier/Classifier/Seeds/test_seed_1";
+  std::vector<std::vector<string> > test_images;  
   Segmentor *mySeg = new Segmentor;
   
-  /*
+  
   load2Dvector(test_images, seed_path);
 
   for(unsigned int i = 0; i < test_images.size(); i++) {
     if(test_images[i][2] == "test"){
-      std::string save_path = "/home/matthew/Dropbox/Computer Science/Classifier/Thesis/images/Segmented/"
+      std::string save_path = "/home/matthew/Documents/classifier/website/images/"
 	+ test_images[i][1] + ".jpg";
       cv::Mat img = cv::imread(test_images[i][0]), res, res_img;
-      mySeg->getMask(img,res);
-      mySeg->changeImage(img, res, res_img);
-      cv::imwrite(save_path, res_img);
+      
+      cv::imwrite(save_path, img);
       std::cout << "Writing: " << save_path << std::endl;
     }
   }
-  ********/
+  
 
-
+  /*
       cv::Mat img = cv::imread("google.jpg"), res, res_img;
       mySeg->getMask(img,res);
       mySeg->changeImage(img, res, res_img);
       cv::imwrite("google_segmented.jpg", res_img);
-      
+  */  
     
   
 

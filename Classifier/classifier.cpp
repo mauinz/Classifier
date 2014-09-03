@@ -974,27 +974,8 @@ std::string classify(std::string svm_path, std::string vocab_path, std::string i
   Mat img = imread(img_src), mask, response_hist, colour_hist,full_hist;      
   vector<KeyPoint> keypoints;
   myseg->getMask(img, mask);
-  if(use_hist){
-
-    detector->detect(img,keypoints,mask);
-    //std::cout << "Detected Key Points: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
-    bowide.compute(img, keypoints, response_hist);
-    //std::cout << "BoW histogram found: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
-    //start = std::clock();
-    if(use_hist_pyramid){
-      myclas->getHistPyramid(img,colour_hist,mask);
-    }
-    else{
-      myclas->getHist(img,colour_hist,mask);
-    }
-    //std::cout << "Response histogram found: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
-    colour_hist.convertTo(colour_hist,response_hist.type());
-    hconcat(response_hist,colour_hist,full_hist);
-  }
-  else{
-    detector->detect(img,keypoints);
-    bowide.compute(img, keypoints, full_hist);
-  }
+  myclas->getFeatures( img, mask, full_hist, &bowide);
+  
   float minf = FLT_MAX; string minclass;
  
   int pos;

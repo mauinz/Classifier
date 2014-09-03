@@ -8,22 +8,27 @@ using namespace std;
 using namespace cv;
 
 int main(){
-  /*
+  
   Augmentor * myAug = new Augmentor;
   
   cv::Mat res;
-  std::string seed[5];
-  seed[0] = "/home/matthew/Documents/classifier/Classifier/Seeds/test_seed_1";
-  seed[1] = "/home/matthew/Documents/classifier/Classifier/Seeds/test_seed_2";
-  seed[2] = "/home/matthew/Documents/classifier/Classifier/Seeds/test_seed_3";
-  seed[3] = "/home/matthew/Documents/classifier/Classifier/Seeds/test_seed_4";
-  seed[4] = "/home/matthew/Documents/classifier/Classifier/Seeds/test_seed_5";
+  std::string seed[10];
+  seed[0] = "/home/matthew/Documents/classifier/Classifier/Seeds/test_seed_0";
+  seed[1] = "/home/matthew/Documents/classifier/Classifier/Seeds/test_seed_1";
+  seed[2] = "/home/matthew/Documents/classifier/Classifier/Seeds/test_seed_2";
+  seed[3] = "/home/matthew/Documents/classifier/Classifier/Seeds/test_seed_3";
+  seed[4] = "/home/matthew/Documents/classifier/Classifier/Seeds/test_seed_4";
+  seed[5] = "/home/matthew/Documents/classifier/Classifier/Seeds/test_seed_5";
+  seed[6] = "/home/matthew/Documents/classifier/Classifier/Seeds/test_seed_6";
+  seed[7] = "/home/matthew/Documents/classifier/Classifier/Seeds/test_seed_7";
+  seed[8] = "/home/matthew/Documents/classifier/Classifier/Seeds/test_seed_8";
+  seed[9] = "/home/matthew/Documents/classifier/Classifier/Seeds/test_seed_9";
   //int num_components = 3;
 
 
   // Perform a PCA:
-  for(int i = 1; i < 6; i++){
-    myAug->collectData(seed[i-1],res);
+  for(int i = 0; i < 10; i++){
+    myAug->collectData(seed[i],res);
     PCA pca(res, Mat(), PCA::DATA_AS_ROW);
 
     Mat mean = pca.mean.clone();
@@ -45,9 +50,9 @@ int main(){
   //cout << res.at<int>(0,0);
   delete myAug;
   return 0;
-  */
   
-
+  
+  /*
   cv::Mat img = imread("image.tif",1);
   imshow("window",img);
   cv::waitKey(0);
@@ -109,6 +114,6 @@ int main(){
   imshow("window2",new_image);
   cv::waitKey(0);
   return 0;
-  
+  */
 }
 
