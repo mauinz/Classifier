@@ -88,10 +88,6 @@ int Segmentor::segment(std::string filename, Mat& _res){
     return 1;
   }
 
-  // Show image to user and wait for click
-  // imshow(winName, image);
-  // waitKey();
-
   // Perform grabcut on
   int max_x = image.cols, max_y = image.rows;
   rect = Rect(Point(max_x*(.05),max_y*(.05)), Point(max_x*(.95),max_y*(.95)));
@@ -111,10 +107,6 @@ void Segmentor::getMask(cv::Mat& image, cv::Mat& mask){
   
   const int dx[8] = {-1, -1, 0, 1, 1,  1,  0, -1};
   const int dy[8] = { 0,  1, 1, 1, 0, -1, -1, -1};
-
-  // Show image to user and wait for click
-  // imshow(winName, image);
-  // waitKey();
 
   // Perform grabcut on
   int max_x = image.cols, max_y = image.rows;
@@ -153,14 +145,6 @@ void Segmentor::getMask(cv::Mat& image, cv::Mat& mask){
   }
 
   getBinMask(comMask,mask);
-  //changeImage(image, mask, res);
-  //imshow(winName,res);
-  //imwrite("after.jpg",res);
-  //waitKey(0);
-  
-  //std::cout <<"GC_BGD:"<< GC_BGD << std::endl;
-  //changeImage(image, mask, _res);
-  //waitKey();
-  //return 0;
+
 }
 

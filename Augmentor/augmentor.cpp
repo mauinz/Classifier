@@ -82,6 +82,8 @@ void Augmentor::collectData(std::string file_path, cv::Mat &res){
   std::vector<std::vector<string> > seed_data;
   cv::Mat pixel_matrix = cv::Mat(0,3, CV_8U);
   load2Dvector(seed_data, file_path);
+
+  //For each image, collect pixrl values
   for(unsigned int i = 0; i < seed_data.size(); i++){
     if(seed_data[i][2] == "train"){
       
@@ -94,7 +96,7 @@ void Augmentor::collectData(std::string file_path, cv::Mat &res){
 	  if((int)mask.at<uchar>(j,i) != 0){
 	    
 	    cv::Mat tmp = (cv::Mat_<uchar>(1,3) << img.at<cv::Vec3b>(j,i)[0], img.at<cv::Vec3b>(j,i)[0], img.at<cv::Vec3b>(j,i)[0]);
-	    //std::cout << "(" << i << "," << j << ") " << (int) img.at<cv::Vec3b>(j,i)[0] << ":" <<  (int)img.at<cv::Vec3b>(j,i)[1] << ":" <<  (int)img.at<cv::Vec3b>(j,i)[2] << std::endl;
+	   
 	    pixel_matrix.push_back(tmp);
 	  }
 	}	
@@ -105,87 +107,3 @@ void Augmentor::collectData(std::string file_path, cv::Mat &res){
   
   delete mySeg;
 }
-/*
-
-// vocab_path = Path of vocabulary file
-// train_path = Path of seed file
-//=======================================================================================
-void Classifier::trainSVM(std::string vocab_path, std::string train_path, int seed){
-//=======================================================================================
-  cv::initModule_nonfree();
-  cout << "Training SVM" << endl;
-  cout << "reading vocabulary from file: "<< vocab_path <<endl;
-  Mat vocabulary;
-  FileStorage fs(vocab_path, FileStorage::READ);
-  fs["vocabulary"] >> vocabulary;
-  fs.release();	
-  
-  Ptr<FeatureDetector > detector(new SurfFeatureDetector()); //detector
-  Ptr<DescriptorExtractor > extractor(
-				      new OpponentColorDescriptorExtractor(
-									   Ptr<DescriptorExtractor>(new SurfDescriptorExtractor())
-									   )
-				      );
-  Ptr<DescriptorMatcher > matcher(new BFMatcher);
-  BOWImgDescriptorExtractor bowide(extractor,matcher);
-  bowide.setVocabulary(vocabulary);
-  
-  // Reading in response histograms
-  map<string,Mat> classes_training_data; classes_training_data.clear();
-  vector<std::string> class_names;
-  cout << "Reading reponse histograms from training data" << endl;
-  extractTrainingData(train_path,  classes_training_data, vocabulary);
-  
-  cout << "Training with " << classes_training_data.size() << " classes." <<endl;
-  for (map<string,Mat>::iterator it = classes_training_data.begin(); it != classes_training_data.end(); ++it) {
-    cout << " class " << (*it).first << " has " << (*it).second.rows << " samples"<<endl;
-    class_names.push_back((*it).first);
-  }
-  
-  //DATA LOADED AND READY TO TRAIN ==================================================
-  std::cout << "Training Support Vector Machine" << std::endl;
-  time_t     now = time(0);
-  struct tm  tstruct;
-  char       buf[80];
-  tstruct = *localtime(&now);
-  strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &tstruct);
-  stringstream folder_name;
-  folder_name << "SVMS_" << buf;
-  boost::filesystem::create_directories(folder_name.str());
-  for (unsigned int i=0;i<class_names.size();i++) {
-    string class_ = class_names[i];
-    
-    cv::Mat samples(0,(*classes_training_data.begin()).second.cols,(*classes_training_data.begin()).second.type());
-    cv::Mat labels(0,1,CV_32FC1);
-    
-    //copy class samples and label
-    cout << "adding " << classes_training_data[class_].rows << " positive" << endl;
-    samples.push_back(classes_training_data[class_]);
-    Mat class_label = Mat::ones(classes_training_data[class_].rows, 1, CV_32FC1);
-    labels.push_back(class_label);
-
-    //copy rest samples and label
-    for (map<string,Mat>::iterator it1 = classes_training_data.begin(); it1 != classes_training_data.end(); ++it1) {
-      string not_class_ = (*it1).first;
-      if(not_class_.compare(class_)==0) continue;
-      samples.push_back(classes_training_data[not_class_]);
-      class_label = Mat::zeros(classes_training_data[not_class_].rows, 1, CV_32FC1);
-      labels.push_back(class_label);
-    }
-
-    cout << "Train.." << endl;
-    cv::Mat samples_32f; samples.convertTo(samples_32f, CV_32F);
-    if(samples.rows == 0) continue; //phantom class?!
-    CvSVM classifier;
-    classifier.train(samples_32f,labels);
-    
-    stringstream ss;
-    ss << "SVMS_" << to_string(seed) << buf << "/SVM_classifier_";
-    ss << buf << "~";
-    ss << class_ << ".yml";
-    cout << "Saving as: " << ss.str() << endl;
-    classifier.save(ss.str().c_str());
-  }
-}
-
-*/

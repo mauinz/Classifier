@@ -47,73 +47,9 @@ int main(){
     res.release();
   }
   
-  //cout << res.at<int>(0,0);
   delete myAug;
   return 0;
   
-  
-  /*
-  cv::Mat img = imread("image.tif",1);
-  imshow("window",img);
-  cv::waitKey(0);
-  int seed = 1;
-  Mat eigenvalues, eigenvectors, res;
-  
-  std::string pca_file = "PCA/pca_" + to_string(seed) + ".yml";
-  FileStorage fs(pca_file, FileStorage::READ);
-  fs["Eigenvalues"] >> eigenvalues;
-  fs["Eigenvector"] >> eigenvectors;
-  
-  transpose(eigenvalues,eigenvalues);
-  
-  Mat alpha, rgb, tmp;
-  //Vec3b colour;
-  
-  Mat new_image = Mat::zeros( img.size(), img.type() );
 
-  std::default_random_engine de(time(0));
-  std::normal_distribution<double> distribution(0.0,0.1);
-  
-  alpha = (Mat_<float>(1,3) << distribution(de)/600, distribution(de)/600, distribution(de)/600);
-  
-  transpose(alpha,alpha);
-  //cout << eigenvalues.rows << endl;
-  //cout << eigenvalues.cols << endl;
-  //cout << eigenvalues.type() << endl;
-  //cout << alpha.type() << endl;
-  tmp = alpha*eigenvalues;
-  transpose(eigenvectors,eigenvectors);
-  transpose(tmp,tmp);
-  rgb = eigenvectors*tmp;
-  
-  cout << "b:" << rgb.at<float>(0,0) << " using: " << (int)round(rgb.at<float>(0,0)) << endl;
-  cout << "g:" << rgb.at<float>(0,1) << " using: " << (int)round(rgb.at<float>(0,1)) << endl;
-  cout << "r:" << rgb.at<float>(0,2) << " using: " << (int)round(rgb.at<float>(0,2)) << endl;
-  cout << "alpha:" << alpha << endl;
-  cout << "img " << (int)img.at<Vec3b>(0,0)[0] << endl;
-  cout << "img " << (int)img.at<Vec3b>(0,0)[1] << endl;
-  cout << "img " << (int)img.at<Vec3b>(0,0)[2] << endl;
-  //colour.val[1] = (int)rgb.at<double>(0,1);
-  //colour.val[2] = (int)rgb.at<double>(0,2);
-  for( int y = 0; y < img.rows; y++ ){
-    for( int x = 0; x < img.cols; x++ ){
-      for( int c = 0; c < 3; c++ ){
-	int val = (int)img.at<Vec3b>(y,x)[c] + (int)round(rgb.at<float>(0,c));
-	if(val <= 0){
-	  new_image.at<Vec3b>(y,x)[c] = (uchar)0;
-	}
-	else if(val >= 255){
-	  new_image.at<Vec3b>(y,x)[c] = (uchar)255;
-	}
-	else{
-	  new_image.at<Vec3b>(y,x)[c] = (uchar)val;
-	}
-      }
-    }
-  }
-  imshow("window2",new_image);
-  cv::waitKey(0);
-  return 0;
-  */
 }
 

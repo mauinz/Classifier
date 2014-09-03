@@ -448,6 +448,7 @@ void Classifier::extractTrainingData(std::string filepath, std::map<string,Mat>&
   bowide.setVocabulary(vocabulary);
   std::cout << "Descriptor size: " << bowide.descriptorSize() << std::endl; 
   
+  //Perform on the fly data augmentation
   for(unsigned int i = 0; i < img_list.size(); i++){
     if(img_list[i][2] == "train"){
       img = imread(img_list[i][0]);
@@ -877,7 +878,7 @@ void Classifier::getmoments(cv::Mat binmask, double hu[7]){
 //=======================================================================================
 void Classifier::pcaImage(cv::Mat img, cv::Mat eigenvalues, cv::Mat eigenvectors, cv::Mat &res){
 //=======================================================================================
-
+  //Alter an image using PCA eigenvalues and vectors
   transpose(eigenvalues,eigenvalues);
   
   Mat alpha, rgb, tmp;
@@ -953,9 +954,6 @@ std::string classify(std::string svm_path, std::string vocab_path, std::string i
       
       std::string class_name = tmp_line[1].substr(0, tmp_line[1].size()-4);
       
-      //classes_classifiers.insert(make_pair(class_name, unique_ptr<CvSVM>(new CvSVM())));
-      //classes_classifiers[class_name]->load((dir->path().string()).c_str());
-      
       classes.push_back(class_name);
       classifiers.push_back(new CvSVM());
       svm_paths.push_back(dir->path().string());
@@ -1007,10 +1005,6 @@ std::string classify(std::string svm_path, std::string vocab_path, std::string i
   delete myseg;
   delete myclas;
   minclass = classes[pos];
-  std::cout << "Identified: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
-  //TIMER============================================
-  //std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
-  //TIMER============================================
   return minclass;
 }
  

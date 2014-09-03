@@ -142,8 +142,7 @@ int main(int argc,  char** argv){
     delete myseg;
     */
   }
-  
-  cout << "still fine" << endl;  
+   
   delete myclas;
   return 0;
 }
