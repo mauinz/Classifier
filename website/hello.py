@@ -2,8 +2,8 @@ import os, sys, classifier, wikipedia
 from flask import Flask, render_template, request, redirect, url_for, send_from_directory
 from werkzeug.utils import secure_filename
 
-IMAGES_FOLDER = '/home/matthew/Documents/classifier/website/uploads'
-UPLOAD_FOLDER = '/home/matthew/Documents/classifier/website/images'
+IMAGES_FOLDER = '/home/matthew/Documents/classifier/website/images'
+UPLOAD_FOLDER = '/home/matthew/Documents/classifier/website/uploads'
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif', 'tif', 'tiff','JPG'])
 SVM_PATH = '/home/matthew/Documents/classifier/Classifier/SVM_final/SVMS_1_2014-08-23.15:53:04'
 VOCAB_PATH = '/home/matthew/Documents/classifier/Classifier/Vocabularies/Vocabulary_1_2014-08-19.18:28:23.yml'
@@ -14,8 +14,8 @@ VOCAB_PATH = '/home/matthew/Documents/classifier/Classifier/Vocabularies/Vocabul
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['IMAGES_FOLDER'] = UPLOAD_FOLDER
-#app.debug = True
+app.config['IMAGES_FOLDER'] = IMAGES_FOLDER
+app.debug = True
 #@app.route('/')
 #def index():
 #    return 'Index Page'
@@ -25,7 +25,7 @@ def allowed_file(filename):
 
 @app.route('/')
 def root():
-#    return 'working'
+    #return 'working'
     return render_template('index.html')
 
 @app.route('/hello')
@@ -58,7 +58,7 @@ def butterflies():
             file.save(filepath)
             filename = 'http://146.169.45.105/uploads/' + filename
             s = classifier.classify(SVM_PATH,VOCAB_PATH, filepath)
-	    res = s.split(',')
+            res = s.split(',')
             page = wikipedia.page(res[0])
             url = page.url
             #wiki = page.html()
@@ -72,7 +72,10 @@ def butterflies():
                 wiki = wiki.replace('\n\n\n==','<h2>')
                 wiki = wiki.replace('==\n','</h2>')
             #return redirect(url_for('uploaded_file',filename=filename))
-            return render_template('results.html',res1=res[0],res2=res[1],filename=filename,wiki=wiki,url=url)
+            if(len(res)>1):
+                return render_template('results.html',res1=res[0],res2=res[1],filename=filename,wiki=wiki,url=url)
+            else:
+                return render_template('results.html',res1=res[0],res2=res[0],filename=filename,wiki=wiki,url=url)
     return render_template('butterflies.html')
 
 @app.route('/wasps')
