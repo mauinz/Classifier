@@ -57,8 +57,9 @@ def butterflies():
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(filepath)
             filename = 'http://146.169.45.105/uploads/' + filename
-            res = classifier.classify(SVM_PATH,VOCAB_PATH, filepath)
-            page = wikipedia.page(res)
+            s = classifier.classify(SVM_PATH,VOCAB_PATH, filepath)
+	    res = s.split(',')
+            page = wikipedia.page(res[0])
             url = page.url
             #wiki = page.html()
             wiki = page.content
@@ -71,7 +72,7 @@ def butterflies():
                 wiki = wiki.replace('\n\n\n==','<h2>')
                 wiki = wiki.replace('==\n','</h2>')
             #return redirect(url_for('uploaded_file',filename=filename))
-            return render_template('results.html',res=res,filename=filename,wiki=wiki,url=url)
+            return render_template('results.html',res1=res[0],res2=res[1],filename=filename,wiki=wiki,url=url)
     return render_template('butterflies.html')
 
 @app.route('/wasps')

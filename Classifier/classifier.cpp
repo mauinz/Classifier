@@ -40,21 +40,20 @@ const int img_total = 571; // estimate of number of images
 //const float hist_factor = 0.2;
 
 Classifier::Classifier(){
+  
   cv::initModule_nonfree();
   cv::initModule_features2d();
-  
-  detector =  makePtr<PyramidAdaptedFeatureDetector>(FeatureDetector::create("SIFT"),py_level); //det]ector
+  //Set up base extractor and dector values
+  detector =  makePtr<PyramidAdaptedFeatureDetector>(FeatureDetector::create("SIFT"),py_level); // Detector
   extractor = DescriptorExtractor::create("OpponentSIFT"); // Extractor  
-  matcher = DescriptorMatcher::create("BruteForce");
+  matcher = DescriptorMatcher::create("BruteForce"); // Matcher
   myseg = new Segmentor;
 }
 
 Classifier::~Classifier(){
-  //delete detector;
-  //delete extractor;
-  //delete matcher;
   delete myseg;
 }
+//Some helper functions
 template <typename T>
 //=======================================================================================
 std::string to_string(T value){
@@ -283,8 +282,9 @@ int Classifier::makeFileList(std::string folderpath, int seed){
   return 0;
   
 }
+//=======================================================================================
 int Classifier::kFoldFileList(std::string folderpath, int seed){
-
+//=======================================================================================
   std::vector<std::string> filelist;
 
   int count = 10;
@@ -302,11 +302,13 @@ int Classifier::kFoldFileList(std::string folderpath, int seed){
   // Choose which test case each image will belong to
   int test_count[filelist.size()];
   
+  // Assign each image to a test set
   for(unsigned int i = 0; i < filelist.size(); i++){
     //std::cout << folderlist[i] << ": " << count << std::endl;
     test_count[i] = rand() % count;
     //std::cout << test_count[i] << std::endl;
   }
+  // Save in test seed format
   for(int test = 0; test < 10; test++){
     cout << test << endl;
     std::vector<std::vector<string> > image_split;
@@ -342,6 +344,7 @@ std::string Classifier::trainSVM(std::string vocab_path, std::string train_path,
     cout << "reading vocabulary from file: "<< vocab_path <<endl;
   }
 
+  // Set up vocabulary
   Mat vocabulary;
   FileStorage fs(vocab_path, FileStorage::READ);
   fs["vocabulary"] >> vocabulary;
@@ -429,6 +432,7 @@ void Classifier::extractTrainingData(std::string filepath, std::map<string,Mat>&
 
   Mat eigenvalues, eigenvectors, res;
   
+  // Get PCA evs for on the fly image augmentation
   std::string pca_file = "PCA/pca_" + to_string(seed) + ".yml";
   FileStorage fs(pca_file, FileStorage::READ);
   fs["Eigenvalues"] >> eigenvalues;
@@ -444,6 +448,7 @@ void Classifier::extractTrainingData(std::string filepath, std::map<string,Mat>&
   std::vector<std::vector<string> > img_list;
   load2Dvector(img_list,filepath);
   
+  // Set up bag of words vocabulary
   BOWImgDescriptorExtractor bowide(extractor,matcher);
   bowide.setVocabulary(vocabulary);
   std::cout << "Descriptor size: " << bowide.descriptorSize() << std::endl; 
@@ -498,6 +503,7 @@ std::string Classifier::trainSVMParams(std::string vocab_path, std::string train
     cout << "Training SVM Parameters" << endl;
     cout << "reading vocabulary from file: "<< vocab_path <<endl;
   }
+  // Set up vocabualry
   Mat vocabulary;
   FileStorage fs(vocab_path, FileStorage::READ);
   fs["vocabulary"] >> vocabulary;
@@ -505,7 +511,7 @@ std::string Classifier::trainSVMParams(std::string vocab_path, std::string train
   
   BOWImgDescriptorExtractor bowide(extractor,matcher);
   bowide.setVocabulary(vocabulary);
-  cout << "working" << endl;
+  
   // Reading in response histograms
   map<string,Mat> classes_training_data; classes_training_data.clear();
   vector<std::string> class_names;
@@ -590,6 +596,7 @@ std::string Classifier::trainSVMParams(std::string vocab_path, std::string train
 // seed_path  = Path to seed file
 // vocav_path = Path to vocabulary file
 // svm_path   = Path to SVM files
+// Legacy function please see testSVMParams
 //=======================================================================================
 void Classifier::testSVM(std::string seed_path, std::string vocab_path, std::string svm_path, int seed, bool verbose){
 //=======================================================================================
@@ -630,7 +637,8 @@ void Classifier::testSVM(std::string seed_path, std::string vocab_path, std::str
       
     }
   }
-
+  
+  // Search for test cases and extract reponse histograms
   for(unsigned int i = 0; i < test_images.size(); i++) {
     if(test_images[i][2] == "test"){
       Mat img = imread(test_images[i][0]), mask,response_hist, colour_hist,full_hist, tmp;
@@ -710,15 +718,12 @@ void Classifier::testSVM(std::string seed_path, std::string vocab_path, std::str
 
   delete myseg;
 }
-
+// Calculates histograms
 //=======================================================================================
 void Classifier::getHist(cv::Mat src, cv::Mat &res, cv::Mat mask, bool verbose){
 //=======================================================================================
   Mat dst, tmp;
   res.release();
-  // Get mask from segmentor
-
-  
 
   /// Separate the image in 3 places ( B, G and R )
   vector<Mat> bgr_planes, hsv_planes;
@@ -804,21 +809,21 @@ void Classifier::getHist(cv::Mat src, cv::Mat &res, cv::Mat mask, bool verbose){
 	      Scalar( 0, 255, 0), 2, 8, 0  );
       }
     
-    /// Display
+    // Display
     namedWindow("calcHist Demo", CV_WINDOW_AUTOSIZE );
     imshow("calcHist Demo", histImage );
-    //imwrite("Euphydryas-aurinia-hist.jpeg",histImage);
     waitKey(0);
   }
 
 
 }
+// Pyramid histogram calculations
 //=======================================================================================
 void Classifier::getHistPyramid(cv::Mat src, cv::Mat &res, cv::Mat mask, bool verbose){
 //=======================================================================================
   cv::Mat full;
   int step_y = src.rows/hist_level, step_x = src.cols/hist_level;
-
+  // find seperate histograms
   for(int i = 0; i < hist_level; i++){
     for(int j = 0; j < hist_level; j++){
       cv::Mat tmp, rect_mask;
@@ -831,10 +836,12 @@ void Classifier::getHistPyramid(cv::Mat src, cv::Mat &res, cv::Mat mask, bool ve
       }
       else{
 	getHist(src,tmp,rect_mask,verbose);
+	// Concat together
 	hconcat(full,tmp,full);
       }
     }
   }
+  // Normalise
   CvScalar total = sum(full);
   full /= total.val[0];
   res = full;
@@ -845,10 +852,16 @@ void Classifier::getFeatures(cv::Mat img,cv::Mat mask, cv::Mat &res, BOWImgDescr
   double hu[7];
   getmoments(mask,hu);
   vector<KeyPoint> keypoints;
+  
+  // Hu moments
   cv::Mat mom = (Mat_<double>(1,7) << hu[0], hu[1], hu[2], hu[3], hu[4], hu[5], hu[6]);
   cv::Mat response_hist,colour_hist,tmp,full_hist;
+  
   detector->detect(img,keypoints,mask);
+  
+  // Get histograms
   if(use_hist){
+    // Visual vocabulary
     bowide->compute(img, keypoints, response_hist);
     if(use_hist_pyramid){
       getHistPyramid(img,colour_hist,mask);
@@ -862,6 +875,7 @@ void Classifier::getFeatures(cv::Mat img,cv::Mat mask, cv::Mat &res, BOWImgDescr
     hconcat(tmp,mom, full_hist);
   }
   else{
+    // Visual vocabulary
     bowide->compute(img, keypoints, response_hist);
     mom.convertTo(mom,response_hist.type());
     hconcat(response_hist,mom,full_hist);
@@ -890,6 +904,7 @@ void Classifier::pcaImage(cv::Mat img, cv::Mat eigenvalues, cv::Mat eigenvectors
   
   alpha = (Mat_<float>(1,3) << distribution(de)/img_total, distribution(de)/img_total, distribution(de)/img_total);
   
+  // Make calculations on how much to alter image pixel value by
   transpose(alpha,alpha);
   tmp = alpha*eigenvalues;
   transpose(eigenvectors,eigenvectors);
@@ -915,17 +930,17 @@ void Classifier::pcaImage(cv::Mat img, cv::Mat eigenvalues, cv::Mat eigenvectors
   res = new_image;
 }
 //Function which is visible to the python wrapper 
-std::string classify(std::string svm_path, std::string vocab_path, std::string img_src)
-{
+//=======================================================================================
+std::string classify(std::string svm_path, std::string vocab_path, std::string img_src){
+//=======================================================================================
   //TIMER============================================
   std::clock_t    start;
   start = std::clock();
   //TIMER============================================
   cv::initModule_nonfree();
+  //Segmentor
   Segmentor * myseg = new Segmentor;
   Classifier * myclas = new Classifier;
-  
-  //map<string,unique_ptr<CvSVM>> classes_classifiers;//CvSVM tmp_SVM;
 
   vector<string> classes, svm_paths;
   vector<CvSVM*> classifiers;
@@ -935,7 +950,7 @@ std::string classify(std::string svm_path, std::string vocab_path, std::string i
   Ptr<DescriptorMatcher > matcher(new BFMatcher);
   BOWImgDescriptorExtractor bowide(extractor,matcher);
 
-  //cout << "Reading vocabulary from file: "<< vocab_path <<endl;
+  // Reading vocabulary
   Mat vocabulary;
   FileStorage fs(vocab_path, FileStorage::READ);
   fs["vocabulary"] >> vocabulary;
@@ -962,32 +977,37 @@ std::string classify(std::string svm_path, std::string vocab_path, std::string i
   }
   std::cout << "Preped file list and classes: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
   
+  // Load SVMs
 #pragma omp parallel for
   for(int i = 0; i < svm_count; i++){
-    //std::cout << "int i:  " << i << endl;
     classifiers[i]->load(svm_paths[i].c_str());
   }
 
-  std::cout << "Loaded SVMS: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+  //std::cout << "Loaded SVMS: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
   Mat img = imread(img_src), mask, response_hist, colour_hist,full_hist;      
   vector<KeyPoint> keypoints;
+  // Get mask and features from image
   myseg->getMask(img, mask);
   myclas->getFeatures( img, mask, full_hist, &bowide);
   
-  float minf = FLT_MAX; string minclass;
+  float minf = FLT_MAX, minf2 = FLT_MAX;
+  string minclass;
  
-  int pos;
-  float private_minf;
+  int pos, pos2;
+  float private_minf, private_minf2;
   float res;
-  int private_pos;
-#pragma omp parallel private(private_minf,private_pos,res)
+  int private_pos,private_pos2;
+#pragma omp parallel private(private_minf,private_minf2,private_pos2,private_pos,res)
   {
     private_minf = FLT_MAX;
+    private_minf2 = FLT_MAX;
 #pragma omp for
     for ( int i = 0; i < svm_count; i++) {
       res = classifiers[i]->predict(full_hist,true);
       //std::cout << "int i:  " << i << endl;
       if (res < private_minf ){
+	private_minf2 = private_minf;
+	private_pos2 = private_pos;
 	private_minf = res;
 	private_pos = i;
       }
@@ -996,6 +1016,14 @@ std::string classify(std::string svm_path, std::string vocab_path, std::string i
 #pragma omp critical
       {
 	if ( private_minf < minf ){
+	  if( private_minf2 < minf2){
+	    minf2 = private_minf2;
+	    pos2 = private_pos2;
+	  }
+	  else{
+	    minf2=minf;
+	    pos2=pos;
+	  }
 	  minf = private_minf;
 	  pos = private_pos;
 	}
@@ -1005,11 +1033,152 @@ std::string classify(std::string svm_path, std::string vocab_path, std::string i
   delete myseg;
   delete myclas;
   minclass = classes[pos];
-  return minclass;
+  std::string csv = minclass + "," + classes[pos2];
+  return csv;
 }
- 
+//=======================================================================================
+void Classifier::classify_image(std::string svm_path, std::string vocab_path, std::string img_src){
+//=======================================================================================
+  
+  cv::initModule_nonfree();
+  //Segmentor
+  Segmentor * myseg = new Segmentor;
+  Classifier * myclas = new Classifier;
 
+  vector<string> classes, svm_paths;
+  vector<CvSVM*> classifiers;
+
+  Ptr<FeatureDetector> detector =  makePtr<PyramidAdaptedFeatureDetector>(FeatureDetector::create("SIFT"),py_level); //detector
+  Ptr<DescriptorExtractor > extractor = DescriptorExtractor::create("OpponentSIFT"); // Extractor
+  Ptr<DescriptorMatcher > matcher(new BFMatcher);
+  BOWImgDescriptorExtractor bowide(extractor,matcher);
+
+  // Reading vocabulary
+  Mat vocabulary;
+  FileStorage fs(vocab_path, FileStorage::READ);
+  fs["vocabulary"] >> vocabulary;
+  fs.release();	
  
+  bowide.setVocabulary(vocabulary);
+  
+  // Populate SVMs
+  //#pragma omp for
+  int svm_count = 0;
+  for ( boost::filesystem::recursive_directory_iterator end, dir(svm_path); 
+	dir != end; ++dir ) {
+    if(boost::filesystem::is_regular_file(*dir)){
+      vector<std::string> tmp_line;
+      boost::split(tmp_line,dir->path().string(), boost::is_any_of("+"));
+      
+      std::string class_name = tmp_line[1].substr(0, tmp_line[1].size()-4);
+      
+      classes.push_back(class_name);
+      classifiers.push_back(new CvSVM());
+      svm_paths.push_back(dir->path().string());
+      svm_count++;
+    }
+  }
+  
+  
+  // Load SVMs
+#pragma omp parallel for
+  for(int i = 0; i < svm_count; i++){
+    classifiers[i]->load(svm_paths[i].c_str());
+  }
+
+  boost::filesystem::path  dir(img_src);
+  //If folder
+  if(!boost::filesystem::is_regular_file(dir)){
+    for ( boost::filesystem::recursive_directory_iterator end, dir(img_src); 
+	  dir != end; ++dir ) {
+      if(boost::filesystem::is_regular_file(*dir)){
+	std::string img_src_dir = dir->path().string();
+	std::cout << "Reading: " << img_src_dir << std::endl;
+
+	Mat img = imread(img_src_dir), mask, response_hist, colour_hist,full_hist;      
+	vector<KeyPoint> keypoints;
+	// Get mask and features from image
+	myseg->getMask(img, mask);
+	myclas->getFeatures( img, mask, full_hist, &bowide);
+  
+	float minf = FLT_MAX; string minclass;
+  
+	int pos;
+	float private_minf;
+	float res;
+	int private_pos;
+#pragma omp parallel private(private_minf,private_pos,res)
+	{
+	  private_minf = FLT_MAX;
+#pragma omp for
+	  for ( int i = 0; i < svm_count; i++) {
+	    res = classifiers[i]->predict(full_hist,true);
+	    //std::cout << "int i:  " << i << endl;
+	    if (res < private_minf ){
+	      private_minf = res;
+	      private_pos = i;
+	    }
+	  }
+	  if ( private_minf < minf ) {
+#pragma omp critical
+	    {
+	      if ( private_minf < minf ){
+		minf = private_minf;
+		pos = private_pos;
+	      }
+	    }
+	  }
+	}
+	minclass = classes[pos];
+	cout << "Classification: " <<  minclass <<std::endl <<std::endl <<std::endl;
+      }
+    }
+  }
+  else{
+    
+    std::cout << "Reading: " << img_src << std::endl;
+    
+    Mat img = imread(img_src), mask, response_hist, colour_hist,full_hist;      
+    vector<KeyPoint> keypoints;
+    // Get mask and features from image
+    myseg->getMask(img, mask);
+    myclas->getFeatures( img, mask, full_hist, &bowide);
+    
+    float minf = FLT_MAX; string minclass;
+    
+    int pos;
+    float private_minf;
+    float res;
+    int private_pos;
+#pragma omp parallel private(private_minf,private_pos,res)
+    {
+      private_minf = FLT_MAX;
+#pragma omp for
+      for ( int i = 0; i < svm_count; i++) {
+	res = classifiers[i]->predict(full_hist,true);
+	//std::cout << "int i:  " << i << endl;
+	if (res < private_minf ){
+	  private_minf = res;
+	  private_pos = i;
+	}
+      }
+      if ( private_minf < minf ) {
+#pragma omp critical
+	{
+	  if ( private_minf < minf ){
+	    minf = private_minf;
+	    pos = private_pos;
+	  }
+	}
+      }
+    }
+    minclass = classes[pos];
+    cout << "Classification: " <<  minclass <<std::endl <<std::endl <<std::endl;
+  }
+  delete myseg;
+  delete myclas;
+  
+} 
 BOOST_PYTHON_MODULE(classifier)
 {
   using namespace boost::python;

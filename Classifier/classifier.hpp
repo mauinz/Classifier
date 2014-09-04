@@ -61,6 +61,7 @@ public:
   void getHistPyramid(cv::Mat src, cv::Mat &res, cv::Mat mask, bool verbose = false);
   void getmoments(cv::Mat binmask, double hu[7]);
   void pcaImage(cv::Mat img, cv::Mat eigenvalues, cv::Mat eigenvectors, cv::Mat &res);
+  void classify_image(std::string svm_path, std::string vocab_path, std::string img_src);
 };
 
 #endif

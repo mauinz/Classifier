@@ -28,9 +28,12 @@ int main(){
 
   // Perform a PCA:
   for(int i = 0; i < 10; i++){
+    //Collect all the pixel values
     myAug->collectData(seed[i],res);
+    //Calculate eigenvalues/vectors
     PCA pca(res, Mat(), PCA::DATA_AS_ROW);
-
+    
+    //Save and store values
     Mat mean = pca.mean.clone();
     Mat eigenvalues = pca.eigenvalues.clone();
     Mat eigenvectors = pca.eigenvectors.clone();
@@ -38,7 +41,7 @@ int main(){
     std::cout << eigenvalues << std::endl;
     std::cout << eigenvectors << std::endl;
   
-    //Write matrices to pca_happy.yml
+    //Write matrices to pca_seed.yml
     std::string save_path = "pca_" + to_string(i) + ".yml";
     FileStorage fs(save_path, FileStorage::WRITE);
     fs << "Eigenvalues" << eigenvalues;

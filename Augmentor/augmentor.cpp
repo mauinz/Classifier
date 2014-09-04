@@ -25,6 +25,7 @@ using namespace cv;
 Augmentor::Augmentor(){}
 Augmentor::~Augmentor(){}
 
+//Helper functions
 template <typename T>
 //=======================================================================================
 std::string to_string(T value){
@@ -76,27 +77,27 @@ void Augmentor::load2Dvector(std::vector<std::vector<string> > &print,std::strin
  
   myfile.close();
 }
-
+//=======================================================================================
 void Augmentor::collectData(std::string file_path, cv::Mat &res){
+//=======================================================================================
   Segmentor * mySeg = new Segmentor;
   std::vector<std::vector<string> > seed_data;
   cv::Mat pixel_matrix = cv::Mat(0,3, CV_8U);
+  //List of images to process
   load2Dvector(seed_data, file_path);
 
-  //For each image, collect pixrl values
+  //For each image, collect pixel values
   for(unsigned int i = 0; i < seed_data.size(); i++){
     if(seed_data[i][2] == "train"){
-      
       std::cout << "Reading: " << seed_data[i][0] << std::endl;
       Mat img = imread(seed_data[i][0]), mask;
       std::cout << "Detecting" << std::endl;
+      //Get foreground mask
       mySeg->getMask(img, mask);
       for(int i = 0; i < img.cols; i++){
 	for(int j = 0; j < img.rows; j++){
 	  if((int)mask.at<uchar>(j,i) != 0){
-	    
 	    cv::Mat tmp = (cv::Mat_<uchar>(1,3) << img.at<cv::Vec3b>(j,i)[0], img.at<cv::Vec3b>(j,i)[0], img.at<cv::Vec3b>(j,i)[0]);
-	   
 	    pixel_matrix.push_back(tmp);
 	  }
 	}	

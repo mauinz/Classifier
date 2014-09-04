@@ -142,6 +142,13 @@ int main(int argc,  char** argv){
     delete myseg;
     */
   }
+
+  else if(((std::string)"test").compare(argv[1]) == 0){
+    std::string svm_path = "/home/matthew/Documents/classifier/Classifier/SVM_final/SVMS_1_2014-08-23.15:53:04";
+    std::string vocab_path = "/home/matthew/Documents/classifier/Classifier/Vocabularies/Vocabulary_1_2014-08-19.18:28:23.yml";
+    myclas->classify_image(svm_path,vocab_path,argv[2]);
+  }
+ 
    
   delete myclas;
   return 0;
