@@ -59,10 +59,15 @@ def butterflies():
             filename = 'http://146.169.45.105/uploads/' + filename
             s = classifier.classify(SVM_PATH,VOCAB_PATH, filepath)
             res = s.split(',')
-            page = wikipedia.page(res[0])
-            url = page.url
+            try:
+                page = wikipedia.page(res[0])
+                url = page.url
+                wiki = page.content
+            except wikipedia.exceptions.PageError:
+                page = ""
+                url = ""
+                wiki = ""
             #wiki = page.html()
-            wiki = page.content
             try:
                 index = wiki.index('\n\n\n== See')
                 wiki = wiki[:index]
